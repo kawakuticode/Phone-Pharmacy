@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Phone Pharmacy</string>
     <string name="action_settings">Settings</string>
+    <string name="dialog_add">ADD NEW MEDICINE</string>
+    <string name="save">save</string>
+    <string name="cancel">cancel</string>
+    <string name="description_text">medicine description</string>
+    <string name="name_med">name of medicine</string>
+    <string name="choose_photo">choose pic</string>
+    <string name="pick_date">set expiration date</string>
 </resources>
