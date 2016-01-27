@@ -36,7 +36,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
             + KEY_NAME + " TEXT,"
             + KEY_DESCRIPTION + " TEXT,"
             + KEY_EXPIREDATE + " DATE,"
-            + KEY_SRCIMG + " TEXT,);";
+            + KEY_SRCIMG + " TEXT);";
     private static final String TAG = " DATA BASE ";
 
     public DataBaseHandler(Context context) {
@@ -74,7 +74,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
      * @return
      */
     public static Date loadDate(Cursor cursor, int index) {
-
         return cursor.isNull(index) ? null : new Date(cursor.getLong(index));
     }
 
@@ -129,7 +128,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
      * @param id
      */
     public void deleteEntry(long id) {
-
         // delete row in students table based on id
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_NAME, KEY_ID + " = ?",

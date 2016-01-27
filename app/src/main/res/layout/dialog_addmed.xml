@@ -22,7 +22,6 @@
 
     <EditText
         android:id="@+id/description"
-        android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -37,7 +36,6 @@
         android:id="@+id/pickDate"
         android:text="@string/pick_date"
         android:fontFamily="sans-serif"
-        android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -46,7 +44,7 @@
         android:layout_marginBottom="16dp"
         />
 
-    <DatePicker
+<DatePicker
         android:id="@+id/expiration_date"
         android:layout_width="294dp"
         android:layout_height="138dp"
@@ -56,14 +54,40 @@
         android:layout_marginBottom="16dp"
         android:fontFamily="sans-serif"
         android:datePickerMode="spinner" />
+
     <Button
         android:id="@+id/imgSrc"
         android:fontFamily="sans-serif"
         android:text="@string/choose_photo"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp" />
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/save"
+            android:fontFamily="sans-serif"
+            android:text="@string/save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp" />
+        <Button
+            android:id="@+id/cancel"
+            android:fontFamily="sans-serif"
+            android:text="@string/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp" />
+    </LinearLayout>
 
 </LinearLayout>

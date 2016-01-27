@@ -6,6 +6,14 @@
     <string name="cancel">cancel</string>
     <string name="description_text">medicine description</string>
     <string name="name_med">name of medicine</string>
-    <string name="choose_photo">choose pic</string>
+    <string name="choose_photo">select photo</string>
     <string name="pick_date">set expiration date</string>
+    <string name="currentDir">Current Dir</string>
+    <string name="fileSize">File Size</string>
+    <string name="folder">Folder</string>
+    <string name="parentDirectory">Parent Directory</string>
+    <string name="openFolder">Open folder</string>
+    <string name="selectThis">Select this</string>
+    <string name="optionSelection">Option selection</string>
+    <string name="take_photo">take a pic</string>
 </resources>
