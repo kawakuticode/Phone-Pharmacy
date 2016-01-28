@@ -1,38 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/list_selector"
     android:orientation="horizontal"
-    android:padding="7dip">
+    android:padding="5dip">
 
-    <ImageView
-        android:id="@+id/img"
+    <!--  ListRow Left sied Thumbnail image -->
+    <LinearLayout
+        android:id="@+id/med_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_marginRight="5dip"
-        android:padding="3dip"
+        android:background="@drawable/image_bg"
+        android:padding="3dip">
 
-        />
+        <ImageView
+            android:id="@+id/list_image"
+            android:layout_width="50dip"
+            android:layout_height="50dip" />
 
- <!--   <TextView
-        android:id="@+id/txt"
+    </LinearLayout>
+
+    <!-- medicine name -->
+    <TextView
+        android:id="@+id/med_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/img"
-        android:layout_marginTop="10dp"
-        android:layout_toRightOf="@id/img"
-        android:gravity="center"
-        android:textColor="#FFF"
+        android:layout_alignTop="@id/med_img"
+        android:layout_toRightOf="@id/med_img"
+        android:textColor="#040404"
+        android:textSize="15dip"
+        android:textStyle="bold"
+        android:typeface="sans" />
 
-        android:textStyle="bold"&lt;!&ndash; android:textSize="@dimen/text_size"&ndash;&gt;
-        android:typeface="sans" />-->
+    <!-- description medicine -->
+    <TextView
+        android:id="@+id/desc_med"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/med_name"
+        android:layout_marginTop="1dip"
+        android:layout_toRightOf="@id/med_img"
+        android:textColor="#343434"
+        android:textSize="10dip" />
 
-    <ImageView
-        android:id="@+id/playbutton"
+    <!-- expiration date -->
+    <TextView
+        android:id="@+id/exp_date_"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true" />
+        android:layout_alignTop="@id/med_name"
+        android:layout_marginRight="5dip"
+        android:gravity="right"
+        android:text="5:45"
+        android:textColor="#10bcc9"
+        android:textSize="10dip" />
 
 </RelativeLayout>

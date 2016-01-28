@@ -15,12 +15,15 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,11 +49,15 @@ public class MainActivity extends AppCompatActivity {
     private Button bt_chooseFile, bt_save, bt_cancel;
     private Calendar mCalendar;
     private int day, month, mYear;
+    private ListView medicineListView;
     private Date expiration_date;
+    private MedAdapter medAdapter;
 
 
     private List<Med> listMeds = new ArrayList<Med>();
     private DataBaseHandler db;
+    private ImageLoader loaderImg;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +65,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         db = new DataBaseHandler(getApplicationContext());
-
+        medicineListView = (ListView) findViewById(R.id.list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         initCalendar();
-
+        loaderImg = new ImageLoader();
+        listMeds = db.getAllMedsList();
+        medAdapter = new MedAdapter(this, listMeds, loaderImg);
+        medicineListView.setAdapter(medAdapter);
+        registerForContextMenu(medicineListView);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -243,20 +254,7 @@ public class MainActivity extends AppCompatActivity {
         changeButtonText(img_source, bt_chooseFile);
         //  to be used after;
 
-        /*Bitmap bm;
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(selectedImagePath, options);
-        final int REQUIRED_SIZE = 200;
-        int scale = 1;
-        while (options.outWidth / scale / 2 >= REQUIRED_SIZE
-                && options.outHeight / scale / 2 >= REQUIRED_SIZE)
-            scale *= 2;
-        options.inSampleSize = scale;
-        options.inJustDecodeBounds = false;
-        bm = BitmapFactory.decodeFile(selectedImagePath, options);
 
-        ivImage.setImageBitmap(bm);*/
     }
 
     public void listMeds(List<Med> medicine) {
@@ -285,5 +283,31 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId() == R.id.list) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            menu.setHeaderTitle(listMeds.get(info.position).getName());
+            String[] menuItems = getResources().getStringArray(R.array.menu);
+            for (int i = 0; i < menuItems.length; i++) {
+                menu.add(Menu.NONE, i, i, menuItems[i]);
+            }
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int menuItemIndex = item.getItemId();
+        String[] menuItems = getResources().getStringArray(R.array.menu);
+       /* String menuItemName = menuItems[menuItemIndex];
+        String listItemName = listMeds.get(info.position).getName();
+
+        TextView text = (TextView)findViewById(R.id.footer);
+        text.setText(String.format("Selected %s for item %s", menuItemName, listItemName));*/
+        return true;
     }
 }

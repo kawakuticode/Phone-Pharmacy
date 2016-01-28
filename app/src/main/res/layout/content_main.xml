@@ -12,8 +12,19 @@
     tools:context="com.code.kawakuti.phonepharmacy.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
+        <ListView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="#b5b5b5"
+            android:dividerHeight="1dp"
+            android:listSelector="@drawable/list_selector"
+     />
+
+
+   <!-- <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="Hello World!" />-->
+
 </RelativeLayout>
