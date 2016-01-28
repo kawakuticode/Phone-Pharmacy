@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,16 +30,25 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CAMERA = 0;
     private static final int SELECT_FILE = 1;
+    private static final String TAG = "PHARMACY";
     private TextView med_name, med_description;
-    private DatePicker expiration_date;
+    private DatePicker expiration_date_picker;
     private String img_source;
     private Button bt_chooseFile, bt_save, bt_cancel;
+    private Calendar mCalendar;
+    private int day, month, mYear;
+    private Date expiration_date;
+
+
     private List<Med> listMeds = new ArrayList<Med>();
     private DataBaseHandler db;
 
@@ -48,9 +58,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         db = new DataBaseHandler(getApplicationContext());
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        init();
+        initCalendar();
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -63,10 +74,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void init() {
+    public void initCalendar() {
 
+        mCalendar = new GregorianCalendar();
+        day = mCalendar.get(Calendar.DAY_OF_MONTH);
+        month = mCalendar.get(Calendar.MONTH);
+        mYear = mCalendar.get(Calendar.YEAR);
 
-        /*bt_takePic = (Button) findViewById(R.id.takepic);*/
     }
 
     public Dialog addMedDialog() {
@@ -80,16 +94,23 @@ public class MainActivity extends AppCompatActivity {
 
         med_name = (TextView) builder.findViewById(R.id.name);
         med_description = (TextView) builder.findViewById(R.id.description);
-        expiration_date = (DatePicker) builder.findViewById(R.id.expiration_date);
+        expiration_date_picker = (DatePicker) builder.findViewById(R.id.expiration_date);
         bt_chooseFile = (Button) builder.findViewById(R.id.imgSrc);
         bt_save = (Button) builder.findViewById(R.id.save);
         bt_cancel = (Button) builder.findViewById(R.id.cancel);
 
 
+        expiration_date_picker.init(mYear, month, day, new DatePicker.OnDateChangedListener() {
+            @Override
+            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                mCalendar.set(year, monthOfYear + 1, dayOfMonth);
+                Log.d(TAG, mCalendar.get(Calendar.DAY_OF_MONTH) + " "
+                        + mCalendar.get(Calendar.MONTH) + " " + mCalendar.get(Calendar.YEAR));
+            }
+        });
         bt_chooseFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Botao do caralho ", Toast.LENGTH_SHORT).show();
                 selectImage();
             }
         });
@@ -98,21 +119,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-               // Toast.makeText(getApplicationContext(), "Let's  Save ", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getApplicationContext(), "Let's  Save ", Toast.LENGTH_SHORT).show();
                 if (checkFields(med_name)) {
 
                     Med tmp = new Med();
                     tmp.setName(med_name.getText().toString());
                     tmp.setDescription(med_description.getText().toString());
-                    // tmp.setExpireDate();
+                    tmp.setExpireDate(mCalendar.getTime());
                     tmp.setSrcImage(img_source);
 
-
-                    if ( insertToDataBase(tmp)> 0) {
+                    if (db.addMed(tmp) > 0) {
                         builder.dismiss();
                         Toast.makeText(getApplicationContext(), "Inserted with Sucess", Toast.LENGTH_SHORT).show();
+                        listMeds(db.getAllMedsList());
                     }
-                    }else {
+                } else {
                     Toast.makeText(getApplicationContext(), "CHECK FIELDS", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -126,8 +147,6 @@ public class MainActivity extends AppCompatActivity {
                 builder.cancel();
             }
         });
-
-
 
 
         return builder;
@@ -196,7 +215,18 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         img_source = destination.getAbsolutePath();
+        changeButtonText(img_source, bt_chooseFile);
         // ivImage.setImageBitmap(thumbnail);
+    }
+
+
+    public void changeButtonText(String path, Button choose) {
+
+        if (path.length() != 0) {
+            String[] path_parts = path.split("/");
+            choose.setText(path_parts[path_parts.length - 1]);
+        }
+
     }
 
     @SuppressWarnings("deprecation")
@@ -210,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
 
         String selectedImagePath = cursor.getString(column_index);
         img_source = selectedImagePath;
+        changeButtonText(img_source, bt_chooseFile);
         //  to be used after;
 
         /*Bitmap bm;
@@ -228,8 +259,10 @@ public class MainActivity extends AppCompatActivity {
         ivImage.setImageBitmap(bm);*/
     }
 
-    public Long insertToDataBase(Med med) {
-        return db.addMed(med);
+    public void listMeds(List<Med> medicine) {
+        for (Med med : medicine) {
+            Log.d(TAG, med.toString());
+        }
     }
 
 
