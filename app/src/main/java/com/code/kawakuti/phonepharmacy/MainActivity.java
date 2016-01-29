@@ -70,9 +70,11 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         initCalendar();
         loaderImg = new ImageLoader();
+
         listMeds = db.getAllMedsList();
         medAdapter = new MedAdapter(this, listMeds, loaderImg);
         medicineListView.setAdapter(medAdapter);
+        Log.d("list size begin", listMeds.size() + "");
         registerForContextMenu(medicineListView);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -140,17 +142,16 @@ public class MainActivity extends AppCompatActivity {
                     tmp.setSrcImage(img_source);
 
                     if (db.addMed(tmp) > 0) {
+
                         builder.dismiss();
                         Toast.makeText(getApplicationContext(), "Inserted with Sucess", Toast.LENGTH_SHORT).show();
-                        listMeds(db.getAllMedsList());
+                        displayMeds(listMeds);
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "CHECK FIELDS", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
-
         bt_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -158,8 +159,6 @@ public class MainActivity extends AppCompatActivity {
                 builder.cancel();
             }
         });
-
-
         return builder;
     }
 
@@ -230,9 +229,22 @@ public class MainActivity extends AppCompatActivity {
         // ivImage.setImageBitmap(thumbnail);
     }
 
+    public void displayMeds(List<Med> medTemp) {
+        medTemp.clear();
+        medTemp.addAll(db.getAllMedsList());
+        if (medAdapter == null) {
+            medAdapter = new MedAdapter(this, medTemp, loaderImg);
+            ListView listView = (ListView) findViewById(R.id.list);
+            listView.setAdapter(medAdapter);
+        } else {
+            medAdapter.notifyDataSetChanged();
+        }
+
+
+    }
+
 
     public void changeButtonText(String path, Button choose) {
-
         if (path.length() != 0) {
             String[] path_parts = path.split("/");
             choose.setText(path_parts[path_parts.length - 1]);
@@ -257,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void listMeds(List<Med> medicine) {
+    public void listMyMeds(List<Med> medicine) {
         for (Med med : medicine) {
             Log.d(TAG, med.toString());
         }
@@ -298,6 +310,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
@@ -310,4 +323,67 @@ public class MainActivity extends AppCompatActivity {
         text.setText(String.format("Selected %s for item %s", menuItemName, listItemName));*/
         return true;
     }
+
+    public Dialog editMed(final Med med) {
+
+        /*AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);*/
+        final Dialog builderEdit = new Dialog(MainActivity.this);
+        // Get the layout inflater
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+        builderEdit.setTitle(R.string.dialog_add);
+        builderEdit.setContentView(inflater.inflate(R.layout.dialog_editmed, null));
+
+        edit_name = (TextView) builder.findViewById(R.id.edit_name);
+        edit_description = (TextView) builder.findViewById(R.id.edit_desc);
+        edit_expiration_date_picker = (DatePicker) builder.findViewById(R.id.edit_date);
+        edit_chooseFile = (Button) builder.findViewById(R.id.edit_file);
+        edit_bt_cancel = (Button) builder.findViewById(R.id.edit_cancel);
+
+
+        edit_expiration_date_picker.init(mYear, month, day, new DatePicker.OnDateChangedListener() {
+            @Override
+            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                mCalendar.set(year, monthOfYear + 1, dayOfMonth);
+                Log.d(TAG, mCalendar.get(Calendar.DAY_OF_MONTH) + " "
+                        + mCalendar.get(Calendar.MONTH) + " " + mCalendar.get(Calendar.YEAR));
+            }
+        });
+
+        edit_bt_chooseFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectImage();
+            }
+        });
+
+        edit_bt_update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Toast.makeText(getApplicationContext(), "Let's  Save ", Toast.LENGTH_SHORT).show();
+
+
+                med.setName(edit_name.getText().toString());
+                med.setDescription(edit_desc.getText().toString());
+                med.setExpireDate(mCalendar.getTime());
+                med.setSrcImage(img_source);
+
+                if (db.updateEntry(med) > 0) {
+
+                    builderEdit.dismiss();
+                    Toast.makeText(getApplicationContext(), "Updated with Sucess", Toast.LENGTH_SHORT).show();
+                    displayMeds(listMeds);
+                }
+            }
+        });
+        edit_bt_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "Cancel Dialog ", Toast.LENGTH_SHORT).show();
+                builder.cancel();
+            }
+        });
+        return builderEdit;
+
+
 }

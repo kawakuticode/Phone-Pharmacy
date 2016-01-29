@@ -22,9 +22,7 @@ public class MedAdapter extends BaseAdapter {
     private Context context;
     private ImageLoader imageLoader;
 
-
     public MedAdapter(Context context, List<Med> medicines, ImageLoader imageL) {
-
         this.medicines = medicines;
         this.context = context;
         this.imageLoader = imageL;
@@ -65,11 +63,14 @@ public class MedAdapter extends BaseAdapter {
         viewHolder.med_name.setText(medicines.get(position).getName());
         viewHolder.description.setText(medicines.get(position).getDescription());
         if (medicines.get(position).getExpireDate() != null) {
-            if (verifyDate(medicines.get(position).getExpireDate()) != 1) {
-                viewHolder.exp_date.setTextColor(Color.RED);
-                viewHolder.exp_date.setText(convertStringToDate(medicines.get(position).getExpireDate()));
-            } else {
-                viewHolder.exp_date.setText(convertStringToDate(medicines.get(position).getExpireDate()));
+            switch (verifyDate(medicines.get(position).getExpireDate())) {
+                case 0:
+                    viewHolder.exp_date.setTextColor(Color.RED);
+                    viewHolder.exp_date.setText(convertStringToDate(medicines.get(position).getExpireDate()));
+                    break;
+                case 1:
+                    viewHolder.exp_date.setText(convertStringToDate(medicines.get(position).getExpireDate()));
+                    break;
             }
         }
         return convertView;
