@@ -34,7 +34,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -43,17 +42,15 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CAMERA = 0;
     private static final int SELECT_FILE = 1;
     private static final String TAG = "PHARMACY";
-    private TextView med_name, med_description;
-    private DatePicker expiration_date_picker;
+    private TextView med_name, med_description, edit_name, edit_description;
+    private DatePicker expiration_date_picker, edit_expiration_date_picker;
     private String img_source;
-    private Button bt_chooseFile, bt_save, bt_cancel;
+    private Button bt_chooseFile, bt_save, bt_cancel,
+            edit_bt_cancel, edit_bt_update, edit_bt_chooseFile;
     private Calendar mCalendar;
     private int day, month, mYear;
     private ListView medicineListView;
-    private Date expiration_date;
     private MedAdapter medAdapter;
-
-
     private List<Med> listMeds = new ArrayList<Med>();
     private DataBaseHandler db;
     private ImageLoader loaderImg;
@@ -306,6 +303,7 @@ public class MainActivity extends AppCompatActivity {
             String[] menuItems = getResources().getStringArray(R.array.menu);
             for (int i = 0; i < menuItems.length; i++) {
                 menu.add(Menu.NONE, i, i, menuItems[i]);
+
             }
         }
     }
@@ -316,11 +314,18 @@ public class MainActivity extends AppCompatActivity {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int menuItemIndex = item.getItemId();
         String[] menuItems = getResources().getStringArray(R.array.menu);
-       /* String menuItemName = menuItems[menuItemIndex];
-        String listItemName = listMeds.get(info.position).getName();
+        String menuItemName = menuItems[menuItemIndex];
+        switch (menuItemName) {
 
-        TextView text = (TextView)findViewById(R.id.footer);
-        text.setText(String.format("Selected %s for item %s", menuItemName, listItemName));*/
+            case "Edit":
+                Log.d(TAG, menuItemName);
+                editMed(listMeds.get(info.position));
+                break;
+            case "Delete":
+                Log.d(TAG, menuItemName);
+                deleteMed(listMeds.get(info.position));
+                break;
+        }
         return true;
     }
 
@@ -330,24 +335,24 @@ public class MainActivity extends AppCompatActivity {
         final Dialog builderEdit = new Dialog(MainActivity.this);
         // Get the layout inflater
         LayoutInflater inflater = MainActivity.this.getLayoutInflater();
-        builderEdit.setTitle(R.string.dialog_add);
+        builderEdit.setTitle(R.string.dialog_edit);
         builderEdit.setContentView(inflater.inflate(R.layout.dialog_editmed, null));
 
-        edit_name = (TextView) builder.findViewById(R.id.edit_name);
-        edit_description = (TextView) builder.findViewById(R.id.edit_desc);
-        edit_expiration_date_picker = (DatePicker) builder.findViewById(R.id.edit_date);
-        edit_chooseFile = (Button) builder.findViewById(R.id.edit_file);
-        edit_bt_cancel = (Button) builder.findViewById(R.id.edit_cancel);
-
-
-        edit_expiration_date_picker.init(mYear, month, day, new DatePicker.OnDateChangedListener() {
-            @Override
-            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                mCalendar.set(year, monthOfYear + 1, dayOfMonth);
-                Log.d(TAG, mCalendar.get(Calendar.DAY_OF_MONTH) + " "
-                        + mCalendar.get(Calendar.MONTH) + " " + mCalendar.get(Calendar.YEAR));
-            }
-        });
+        edit_name = (TextView) builderEdit.findViewById(R.id.edit_name);
+        edit_description = (TextView) builderEdit.findViewById(R.id.edit_desc);
+        edit_expiration_date_picker = (DatePicker) builderEdit.findViewById(R.id.edit_date);
+        edit_bt_chooseFile = (Button) builderEdit.findViewById(R.id.edit_imgSrc);
+        edit_bt_cancel = (Button) builderEdit.findViewById(R.id.edit_cancel);
+        edit_bt_update = (Button) builderEdit.findViewById(R.id.edit_save);
+        edit_expiration_date_picker.init(med.getExpireDate().getYear(), med.getExpireDate().getMonth(),
+                med.getExpireDate().getDay(), new DatePicker.OnDateChangedListener() {
+                    @Override
+                    public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        mCalendar.set(year, monthOfYear + 1, dayOfMonth);
+                        Log.d(TAG, mCalendar.get(Calendar.DAY_OF_MONTH) + " "
+                                + mCalendar.get(Calendar.MONTH) + " " + mCalendar.get(Calendar.YEAR));
+                    }
+                });
 
         edit_bt_chooseFile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -360,11 +365,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                // Toast.makeText(getApplicationContext(), "Let's  Save ", Toast.LENGTH_SHORT).show();
-
-
                 med.setName(edit_name.getText().toString());
-                med.setDescription(edit_desc.getText().toString());
+                med.setDescription(edit_description.getText().toString());
                 med.setExpireDate(mCalendar.getTime());
                 med.setSrcImage(img_source);
 
@@ -380,10 +382,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "Cancel Dialog ", Toast.LENGTH_SHORT).show();
-                builder.cancel();
+                builderEdit.cancel();
             }
         });
         return builderEdit;
 
 
+    }
+
+    public void deleteMed(Med med ) {
+        db.deleteEntry(med.getId());
+        displayMeds(listMeds);
+
+    }
 }

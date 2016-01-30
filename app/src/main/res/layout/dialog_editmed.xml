@@ -1,64 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
 
     <EditText
         android:id="@+id/edit_name"
-        android:inputType="textEmailAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="4dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
-        android:layout_marginBottom="4dp" />
+        android:layout_marginTop="16dp"
+        android:inputType="textEmailAddress" />
 
     <EditText
         android:id="@+id/edit_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
-        android:layout_marginBottom="16dp"
-        android:fontFamily="sans-serif"
-/>
+        android:layout_marginTop="4dp"
+        android:fontFamily="sans-serif" />
 
 
     <TextView
-        android:id="@+id/pickDate"
-        android:text="@string/update_date"
-        android:fontFamily="sans-serif"
+        android:id="@+id/up_exp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
-        android:layout_marginBottom="8dp"
-        />
+        android:layout_marginTop="4dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/update_date" />
 
     <DatePicker
         android:id="@+id/edit_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginBottom="12dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
-        android:layout_marginBottom="12dp"
-        android:fontFamily="sans-serif"
+        android:layout_marginTop="4dp"
+        android:calendarViewShown="false"
         android:datePickerMode="spinner"
-        android:calendarViewShown="false"/>
+        android:fontFamily="sans-serif" />
 
     <Button
         android:id="@+id/edit_imgSrc"
-        android:fontFamily="sans-serif"
-        android:text="@string/choose_photo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
         android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp" />
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="4dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/choose_photo" />
 
 
     <LinearLayout
@@ -67,25 +66,26 @@
 
         <Button
             android:id="@+id/edit_save"
-            android:fontFamily="sans-serif"
-            android:text="@string/save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="4dp"
             android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp" />
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="4dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/save" />
+
         <Button
             android:id="@+id/edit_cancel"
-            android:fontFamily="sans-serif"
-            android:text="@string/cancel"
-            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_gravity="center"
             android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp" />
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="4dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/cancel" />
     </LinearLayout>
 
-</LinearLayout>
+
 </LinearLayout>

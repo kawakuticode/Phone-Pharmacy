@@ -16,4 +16,6 @@
     <string name="selectThis">Select this</string>
     <string name="optionSelection">Option selection</string>
     <string name="take_photo">take a pic</string>
+    <string name="dialog_edit">EDIT MEDICINE</string>
+    <string name="update_date">Update date of expiration</string>
 </resources>
