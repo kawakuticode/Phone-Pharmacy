@@ -20,4 +20,7 @@
     <string name="update_date">Update date of expiration</string>
     <string name="update">update</string>
     <string name="delete">delete</string>
+    <string name="title_activity_list_medicine">ListMedicine</string>
+    <string name="title_activity_find_pharmacy_fragment">FindPharmacyFragment</string>
+    <string name="title_activity_main2">Main2Activity</string>
 </resources>

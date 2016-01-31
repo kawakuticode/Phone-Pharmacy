@@ -9,22 +9,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.code.kawakuti.phonepharmacy.MainActivity"
-    tools:showIn="@layout/activity_main">
-
-        <ListView
-            android:id="@+id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:divider="#b5b5b5"
-            android:dividerHeight="1dp"
-            android:listSelector="@drawable/list_selector"
-     />
-
-
-   <!-- <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />-->
+    tools:context="com.code.kawakuti.phonepharmacy.FindPharmacyFragment"
+    tools:showIn="@layout/activity_find_pharmacy_fragment">
 
 </RelativeLayout>
