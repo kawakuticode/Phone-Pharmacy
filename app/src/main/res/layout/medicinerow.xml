@@ -13,13 +13,20 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_marginRight="5dip"
-        android:background="@drawable/image_bg"
-        android:padding="3dip">
 
-        <ImageView
+        android:padding="3dip">
+       <!-- android:background="@drawable/image_bg"-->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="60dip"
+            android:layout_height="60dip"
+            android:layout_centerHorizontal="true"
             android:id="@+id/list_image"
+            />
+       <!-- <ImageView
+            android:id="@+id/list_image"
+
             android:layout_width="50dip"
-            android:layout_height="50dip" />
+            android:layout_height="50dip" />-->
 
     </LinearLayout>
 
@@ -31,7 +38,7 @@
         android:layout_alignTop="@id/med_img"
         android:layout_toRightOf="@id/med_img"
         android:textColor="#040404"
-        android:textSize="15dip"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:typeface="sans" />
 
@@ -44,7 +51,7 @@
         android:layout_marginTop="1dip"
         android:layout_toRightOf="@id/med_img"
         android:textColor="#343434"
-        android:textSize="10dip" />
+        android:textSize="12sp" />
 
     <!-- expiration date -->
     <TextView
@@ -55,8 +62,7 @@
         android:layout_alignTop="@id/med_name"
         android:layout_marginRight="5dip"
         android:gravity="right"
-        android:text="5:45"
         android:textColor="#10bcc9"
-        android:textSize="10dip" />
+        android:textSize="14sp" />
 
 </RelativeLayout>

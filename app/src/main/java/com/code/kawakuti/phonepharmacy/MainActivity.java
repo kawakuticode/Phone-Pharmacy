@@ -3,6 +3,7 @@ package com.code.kawakuti.phonepharmacy;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -18,6 +19,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private DatePicker expiration_date_picker, edit_expiration_date_picker;
     private String img_source;
     private Button bt_chooseFile, bt_save, bt_cancel,
-            edit_bt_cancel, edit_bt_update, edit_bt_chooseFile;
+            edit_bt_cancel, edit_bt_update;
     private Calendar mCalendar;
     private int day, month, mYear;
     private ListView medicineListView;
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Med> listMeds = new ArrayList<Med>();
     private DataBaseHandler db;
     private ImageLoader loaderImg;
-
+    private String options[] = new String[]{"Update", "Delete", "Cancel"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         medicineListView = (ListView) findViewById(R.id.list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        initCalendar();
+        //initCalendar();
         loaderImg = new ImageLoader();
 
         listMeds = db.getAllMedsList();
@@ -74,6 +76,41 @@ public class MainActivity extends AppCompatActivity {
         Log.d("list size begin", listMeds.size() + "");
         registerForContextMenu(medicineListView);
 
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        medicineListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                final Med tmpMed = (Med) parent.getItemAtPosition(position);
+
+                builder.setTitle(tmpMed.getName());
+
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        switch (options[which]) {
+                            case "Update":
+                                Log.d(TAG, "UPDATE _----xxx-> " + tmpMed.toString());
+                                editMed(tmpMed).show();
+
+                                break;
+                            case "Delete":
+                                deleteMed(tmpMed);
+                                Log.d(TAG, "DELETE  ----//> " + tmpMed.toString());
+                                break;
+                            case "Cancel":
+                                Log.d(TAG, "CANCEL ----+> " + tmpMed.toString());
+                                break;
+                        }
+                    }
+                });
+                builder.show();
+                return true;
+            }
+
+        });
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,12 +130,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    public void initCalendarEdit(Med med) {
+        mCalendar = Calendar.getInstance();
+        mCalendar.setTime(med.getExpireDate());
+        day = mCalendar.get(Calendar.DAY_OF_MONTH);
+        month = mCalendar.get(Calendar.MONTH);
+        mYear = mCalendar.get(Calendar.YEAR);
+
+    }
+
     public Dialog addMedDialog() {
 
         /*AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);*/
-        final Dialog builder = new Dialog(MainActivity.this);
+        final Dialog builder = new Dialog(this);
         // Get the layout inflater
-        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+        LayoutInflater inflater = this.getLayoutInflater();
         builder.setTitle(R.string.dialog_add);
         builder.setContentView(inflater.inflate(R.layout.dialog_addmed, null));
 
@@ -109,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         bt_save = (Button) builder.findViewById(R.id.save);
         bt_cancel = (Button) builder.findViewById(R.id.cancel);
 
-
+        initCalendar();
         expiration_date_picker.init(mYear, month, day, new DatePicker.OnDateChangedListener() {
             @Override
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -118,18 +165,17 @@ public class MainActivity extends AppCompatActivity {
                         + mCalendar.get(Calendar.MONTH) + " " + mCalendar.get(Calendar.YEAR));
             }
         });
+
         bt_chooseFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectImage();
             }
         });
-
         bt_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                // Toast.makeText(getApplicationContext(), "Let's  Save ", Toast.LENGTH_SHORT).show();
                 if (checkFields(med_name)) {
 
                     Med tmp = new Med();
@@ -165,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void selectImage() {
         final CharSequence[] items = {"Take Photo", "Choose from Library", "Cancel"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
@@ -198,11 +244,11 @@ public class MainActivity extends AppCompatActivity {
             if (requestCode == SELECT_FILE)
                 onSelectFromGalleryResult(data);
             else if (requestCode == REQUEST_CAMERA)
-                onCaptureImageResult(data);
+                onCaptureImageResult(data, bt_chooseFile);
         }
     }
 
-    private void onCaptureImageResult(Intent data) {
+    private void onCaptureImageResult(Intent data, Button bt) {
         Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
@@ -221,8 +267,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         img_source = destination.getAbsolutePath();
-        changeButtonText(img_source, bt_chooseFile);
+        changeButtonText(img_source, bt);
         // ivImage.setImageBitmap(thumbnail);
     }
 
@@ -236,17 +283,21 @@ public class MainActivity extends AppCompatActivity {
         } else {
             medAdapter.notifyDataSetChanged();
         }
-
-
     }
 
 
     public void changeButtonText(String path, Button choose) {
-        if (path.length() != 0) {
+
+
+        if (path != null) {
+            Log.d(TAG, "=====> path  is not null  ");
             String[] path_parts = path.split("/");
             choose.setText(path_parts[path_parts.length - 1]);
-        }
+        } else if (path == null) {
+            Log.d(TAG, "=====> path  is NULL ");
 
+            choose.setText("select photo");
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -257,11 +308,9 @@ public class MainActivity extends AppCompatActivity {
                 null);
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
         cursor.moveToFirst();
-
         String selectedImagePath = cursor.getString(column_index);
         img_source = selectedImagePath;
         changeButtonText(img_source, bt_chooseFile);
-        //  to be used after;
 
 
     }
@@ -297,14 +346,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
         if (v.getId() == R.id.list) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             menu.setHeaderTitle(listMeds.get(info.position).getName());
-            String[] menuItems = getResources().getStringArray(R.array.menu);
-            for (int i = 0; i < menuItems.length; i++) {
-                menu.add(Menu.NONE, i, i, menuItems[i]);
-
-            }
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.menu_update_options, menu);
         }
     }
 
@@ -313,39 +361,51 @@ public class MainActivity extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int menuItemIndex = item.getItemId();
-        String[] menuItems = getResources().getStringArray(R.array.menu);
-        String menuItemName = menuItems[menuItemIndex];
-        switch (menuItemName) {
+        //  String[] menuItems = getResources().getStringArray(R.menu.menu_update_options);
+        //   String menuItemName = menuItems[menuItemIndex];
+        // boolean status = false;
+        switch (item.getItemId()) {
 
-            case "Edit":
-                Log.d(TAG, menuItemName);
-                editMed(listMeds.get(info.position));
-                break;
-            case "Delete":
-                Log.d(TAG, menuItemName);
-                deleteMed(listMeds.get(info.position));
-                break;
+            case R.id.update:
+                return true;
+
+            case R.id.delete:
+                return true;
+
+            case R.id.cancel_update:
+                return true;
+
+            default:
+                return super.onContextItemSelected(item);
         }
-        return true;
     }
+
 
     public Dialog editMed(final Med med) {
 
-        /*AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);*/
-        final Dialog builderEdit = new Dialog(MainActivity.this);
+        final Dialog builderEdit = new Dialog(this);
+
         // Get the layout inflater
-        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+        LayoutInflater inflater = (LayoutInflater) MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         builderEdit.setTitle(R.string.dialog_edit);
         builderEdit.setContentView(inflater.inflate(R.layout.dialog_editmed, null));
+
 
         edit_name = (TextView) builderEdit.findViewById(R.id.edit_name);
         edit_description = (TextView) builderEdit.findViewById(R.id.edit_desc);
         edit_expiration_date_picker = (DatePicker) builderEdit.findViewById(R.id.edit_date);
-        edit_bt_chooseFile = (Button) builderEdit.findViewById(R.id.edit_imgSrc);
+        bt_chooseFile = (Button) builderEdit.findViewById(R.id.edit_imgSrc);
         edit_bt_cancel = (Button) builderEdit.findViewById(R.id.edit_cancel);
         edit_bt_update = (Button) builderEdit.findViewById(R.id.edit_save);
-        edit_expiration_date_picker.init(med.getExpireDate().getYear(), med.getExpireDate().getMonth(),
-                med.getExpireDate().getDay(), new DatePicker.OnDateChangedListener() {
+
+
+        edit_name.setText(med.getName());
+        edit_description.setText(medChangeDesc(med.getDescription()));
+        changeButtonText(med.getSrcImage(), bt_chooseFile);
+        initCalendarEdit(med);
+
+        edit_expiration_date_picker.init(mYear, month,
+                day, new DatePicker.OnDateChangedListener() {
                     @Override
                     public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                         mCalendar.set(year, monthOfYear + 1, dayOfMonth);
@@ -354,7 +414,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        edit_bt_chooseFile.setOnClickListener(new View.OnClickListener() {
+        bt_chooseFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectImage();
@@ -364,7 +424,6 @@ public class MainActivity extends AppCompatActivity {
         edit_bt_update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 med.setName(edit_name.getText().toString());
                 med.setDescription(edit_description.getText().toString());
                 med.setExpireDate(mCalendar.getTime());
@@ -390,7 +449,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void deleteMed(Med med ) {
+    private String medChangeDesc(String description) {
+
+        if (description != null)
+            return description;
+        else return "";
+    }
+
+    public void deleteMed(Med med) {
         db.deleteEntry(med.getId());
         displayMeds(listMeds);
 

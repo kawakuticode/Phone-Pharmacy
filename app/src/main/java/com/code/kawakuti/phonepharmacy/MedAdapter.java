@@ -59,7 +59,7 @@ public class MedAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.img.setImageBitmap(imageLoader.setMedicineImage(medicines.get(position).getSrcImage()));
+        viewHolder.img.setImageBitmap(imageLoader.setMedicineImage(medicines.get(position).getSrcImage() , 100));
         viewHolder.med_name.setText(medicines.get(position).getName());
         viewHolder.description.setText(medicines.get(position).getDescription());
         if (medicines.get(position).getExpireDate() != null) {

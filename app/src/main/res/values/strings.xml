@@ -18,4 +18,6 @@
     <string name="take_photo">take a pic</string>
     <string name="dialog_edit">EDIT MEDICINE</string>
     <string name="update_date">Update date of expiration</string>
+    <string name="update">update</string>
+    <string name="delete">delete</string>
 </resources>
