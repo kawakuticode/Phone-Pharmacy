@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
     private Calendar mCalendar;
     private int day, month, mYear;
     private ListView medicineListView;
-    private MedAdapter medAdapter;
+    private MedicineAdapter medAdapter;
     private List<Med> listMeds = new ArrayList<Med>();
     private DataBaseHandler db;
     private ImageLoader loaderImg;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
            loaderImg = new ImageLoader();
 
            listMeds = db.getAllMedsList();
-           medAdapter = new MedAdapter(this, listMeds, loaderImg);
+           medAdapter = new MedicineAdapter(this, listMeds, loaderImg);
            medicineListView.setAdapter(medAdapter);
            Log.d("list size begin", listMeds.size() + "");
            registerForContextMenu(medicineListView);
@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
         medTemp.clear();
         medTemp.addAll(db.getAllMedsList());
         if (medAdapter == null) {
-            medAdapter = new MedAdapter(this, medTemp, loaderImg);
+            medAdapter = new MedicineAdapter(this, medTemp, loaderImg);
             ListView listView = (ListView) findViewById(R.id.list);
             listView.setAdapter(medAdapter);
         } else {

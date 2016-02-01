@@ -54,7 +54,7 @@ public class MedicinesFragment extends Fragment {
     private Calendar mCalendar;
     private int day, month, mYear;
     private ListView medicineListView;
-    private MedAdapter medAdapter;
+    private MedicineAdapter medicineAdapter;
     private List<Med> listMeds = new ArrayList<Med>();
     private DataBaseHandler db;
     private ImageLoader loaderImg;
@@ -63,12 +63,7 @@ public class MedicinesFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout resource that'll be returned
-        rootView = inflater.inflate(R.layout.fragment_demo, container, false);
-        // Get the arguments that was supplied when
-        // the fragment was instantiated in the
-        // CustomPagerAdapter
-      /*  Bundle args = getArguments();
-        ((TextView) rootView.findViewById(R.id.textView)).setText("Page " + args.getInt("page_position"));*/
+        rootView = inflater.inflate(R.layout.medicinefragment, container, false);
 
         db = new DataBaseHandler(this.getContext());
         medicineListView = (ListView) rootView.findViewById(R.id.list);
@@ -78,8 +73,8 @@ public class MedicinesFragment extends Fragment {
         loaderImg = new ImageLoader();
 
         listMeds = db.getAllMedsList();
-        medAdapter = new MedAdapter(this.getContext(), listMeds, loaderImg);
-        medicineListView.setAdapter(medAdapter);
+        medicineAdapter = new MedicineAdapter(this.getContext(), listMeds, loaderImg);
+        medicineListView.setAdapter(medicineAdapter);
         Log.d("list size begin", listMeds.size() + "");
         registerForContextMenu(medicineListView);
 
@@ -285,12 +280,12 @@ public class MedicinesFragment extends Fragment {
     public void displayMeds(List<Med> medTemp) {
         medTemp.clear();
         medTemp.addAll(db.getAllMedsList());
-        if (medAdapter == null) {
-            medAdapter = new MedAdapter(getContext(), medTemp, loaderImg);
+        if (medicineAdapter == null) {
+            medicineAdapter = new MedicineAdapter(getContext(), medTemp, loaderImg);
             ListView listView = (ListView) rootView.findViewById(R.id.list);
-            listView.setAdapter(medAdapter);
+            listView.setAdapter(medicineAdapter);
         } else {
-            medAdapter.notifyDataSetChanged();
+            medicineAdapter.notifyDataSetChanged();
         }
     }
 

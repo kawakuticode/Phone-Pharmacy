@@ -16,13 +16,13 @@ import java.util.List;
 /**
  * Created by Russelius on 28/01/16.
  */
-public class MedAdapter extends BaseAdapter {
+public class MedicineAdapter extends BaseAdapter {
 
     private List<Med> medicines;
     private Context context;
     private ImageLoader imageLoader;
 
-    public MedAdapter(Context context, List<Med> medicines, ImageLoader imageL) {
+    public MedicineAdapter(Context context, List<Med> medicines, ImageLoader imageL) {
         this.medicines = medicines;
         this.context = context;
         this.imageLoader = imageL;
