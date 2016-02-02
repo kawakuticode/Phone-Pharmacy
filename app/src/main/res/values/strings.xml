@@ -27,4 +27,9 @@
     <string name="find_hospital">Find a Hospital</string>
     <string name="take_med">take medicine</string>
     <string name="dialog_memo">Add memo</string>
+
+    <string name="title_activity_take_medicine">Time to Take Medicine</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="close_alarm">stop alarm</string>
 </resources>

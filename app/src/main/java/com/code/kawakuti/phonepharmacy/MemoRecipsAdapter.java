@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.TextClock;
 import android.widget.TextView;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public class MemoRecipsAdapter extends BaseAdapter {
     private List<Memo> memorecips;
     private Context context;
 
-    public MemoRecipsAdapter(List<Memo> memorecips, Context context) {
+    public MemoRecipsAdapter(Context context,List<Memo> memorecips) {
         this.memorecips = memorecips;
         this.context = context;
     }
@@ -46,14 +45,14 @@ public class MemoRecipsAdapter extends BaseAdapter {
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(context);
             convertView = inflater.inflate(R.layout.memorerow, parent, false);
-            viewHolder.txtClock = (TextClock) convertView.findViewById(R.id.textClock);
+            viewHolder.txtClock = (TextView) convertView.findViewById(R.id.textClock);
             viewHolder.medToTake = (TextView) convertView.findViewById(R.id.medicine_to_take);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.txtClock = memorecips.get(position).getTextClock();
+        viewHolder.txtClock.setText(memorecips.get(position).getTextClock());
         viewHolder.medToTake.setText(memorecips.get(position).getMedicine_to_take());
 
         return convertView;
@@ -63,7 +62,7 @@ public class MemoRecipsAdapter extends BaseAdapter {
      * private class Holder view and re-use
      */
     private static class ViewHolder {
-        TextClock txtClock;
+        TextView txtClock;
         TextView medToTake;
     }
 }

@@ -1,23 +1,31 @@
 package com.code.kawakuti.phonepharmacy;
 
-import android.widget.TextClock;
-
 /**
  * Created by Russelius on 01/02/16.
  */
 public class Memo {
-    private TextClock textClock;
+
+    private int id;
     private String medicine_to_take;
+    private String textClock;
+
 
     public Memo() {
     }
 
+    public int getId() {
+        return id;
+    }
 
-    public TextClock getTextClock() {
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getTextClock() {
         return textClock;
     }
 
-    public void setTextClock(TextClock textClock) {
+    public void setTextClock(String textClock) {
         this.textClock = textClock;
     }
 
@@ -31,8 +39,8 @@ public class Memo {
 
     @Override
     public String toString() {
-        return "Memo{" +
-                "textClock=" + textClock +
+        return "Memo{" + "ID" + id +
+                ", textClock=" + textClock +
                 ", medicine_to_take='" + medicine_to_take + '\'' +
                 '}';
     }

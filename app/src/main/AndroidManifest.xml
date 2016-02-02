@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:allowBackup="true"
@@ -20,14 +21,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FindPlaces"
-
-            />
+        <activity android:name=".FindPlaces" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA-iEtJ1Mqofg3n9WyjxeLTCAZ_68wR06Y"  />
+            android:value="AIzaSyA-iEtJ1Mqofg3n9WyjxeLTCAZ_68wR06Y" />
 
+        <activity
+            android:name=".TakeMedicineAlarm"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_take_medicine"
+            android:theme="@style/FullscreenTheme">
+        </activity>
+        <receiver android:name=".BroadCastAlarm" >
+        </receiver>
     </application>
 
 </manifest>

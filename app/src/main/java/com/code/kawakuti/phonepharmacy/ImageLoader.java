@@ -9,6 +9,8 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import java.io.File;
+
 /**
  * Created by Russelius on 28/01/16.
  */
@@ -23,39 +25,49 @@ public class ImageLoader {
         options.inJustDecodeBounds = true;
 
         if (selectedImagePath != null) {
-
-            final int REQUIRED_SIZE = 200;
-            int scale = 1;
-            while (options.outWidth / scale / 2 >= REQUIRED_SIZE
-                    && options.outHeight / scale / 2 >= REQUIRED_SIZE)
-                scale *= 2;
-            options.inSampleSize = scale;
-            options.inJustDecodeBounds = false;
-
-            Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath , options);
-            output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(output);
-
-            final int color = 0xff424242;
-            final Paint paint = new Paint();
-            final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-            final RectF rectF = new RectF(rect);
-            final float roundPx = pixels;
-
-            paint.setAntiAlias(true);
-            canvas.drawARGB(0, 0, 0, 0);
-            paint.setColor(color);
-            canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, rect, rect, paint);
+            File f = new File(selectedImagePath);
+            if (f.exists()) {
 
 
+                try {
 
 
-        }else {
+                    final int REQUIRED_SIZE = 200;
+                    int scale = 1;
+                    while (options.outWidth / scale / 2 >= REQUIRED_SIZE
+                            && options.outHeight / scale / 2 >= REQUIRED_SIZE)
+                        scale *= 2;
+                    options.inSampleSize = scale;
+                    options.inJustDecodeBounds = false;
 
-            // selectedImagePath =
+                    Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath, options);
+                    output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(output);
+
+                    final int color = 0xff424242;
+                    final Paint paint = new Paint();
+                    final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+                    final RectF rectF = new RectF(rect);
+                    final float roundPx = pixels;
+
+                    paint.setAntiAlias(true);
+                    canvas.drawARGB(0, 0, 0, 0);
+                    paint.setColor(color);
+                    canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+                    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+                    canvas.drawBitmap(bitmap, rect, rect, paint);
+
+                } catch (OutOfMemoryError o) {
+
+                    o.printStackTrace();
+
+                }
+            }
+        } else {
+
+            selectedImagePath = "file:///android_asset/farmacy.jpg";
+            output = setMedicineImage(selectedImagePath, 100);
 
         }
         return output;
@@ -69,12 +81,12 @@ public class ImageLoader {
         final int REQUIRED_SIZE = 200;
 
 
-         output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight() , Bitmap.Config.ARGB_8888);
+        output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
         final int color = 0xff424242;
         final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0,bitmap.getWidth(), bitmap.getHeight());
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         final RectF rectF = new RectF(rect);
         final float roundPx = pixels;
 

@@ -56,7 +56,7 @@ public class MedicinesFragment extends Fragment {
     private ListView medicineListView;
     private MedicineAdapter medicineAdapter;
     private List<Med> listMeds = new ArrayList<Med>();
-    private DataBaseHandler db;
+    private DataBaseMedsHandler db;
     private ImageLoader loaderImg;
     private String options[] = new String[]{"Update", "Delete", "Cancel"};
     View rootView;
@@ -65,7 +65,7 @@ public class MedicinesFragment extends Fragment {
         // Inflate the layout resource that'll be returned
         rootView = inflater.inflate(R.layout.medicinefragment, container, false);
 
-        db = new DataBaseHandler(this.getContext());
+        db = new DataBaseMedsHandler(this.getContext());
         medicineListView = (ListView) rootView.findViewById(R.id.list);
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) rootView.findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
@@ -317,37 +317,11 @@ public class MedicinesFragment extends Fragment {
         String selectedImagePath = cursor.getString(column_index);
         img_source = selectedImagePath;
         changeButtonText(img_source, bt_chooseFile);
-
-
     }
 
-    public void listMyMeds(List<Med> medicine) {
-        for (Med med : medicine) {
-            Log.d(TAG, med.toString());
-        }
-    }
 
-/*
-@Override
-public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-        }
 
-@Override
-public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-        return true;
-        }
-        return super.onOptionsItemSelected(item);
-        }*/
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
@@ -365,11 +339,6 @@ public boolean onOptionsItemSelected(MenuItem item) {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        int menuItemIndex = item.getItemId();
-        //  String[] menuItems = getResources().getStringArray(R.menu.menu_update_options);
-        //   String menuItemName = menuItems[menuItemIndex];
-        // boolean status = false;
         switch (item.getItemId()) {
 
             case R.id.update:

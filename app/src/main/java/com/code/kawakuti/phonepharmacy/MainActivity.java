@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView medicineListView;
     private MedicineAdapter medAdapter;
     private List<Med> listMeds = new ArrayList<Med>();
-    private DataBaseHandler db;
+    private DataBaseMedsHandler db;
     private ImageLoader loaderImg;
     private String options[] = new String[]{"Update", "Delete", "Cancel"};*/
     private ViewPager mViewPager;
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /*
-           db = new DataBaseHandler(getApplicationContext());
+           db = new DataBaseMedsHandler(getApplicationContext());
            medicineListView = (ListView) findViewById(R.id.list);
            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
            setSupportActionBar(toolbar);
