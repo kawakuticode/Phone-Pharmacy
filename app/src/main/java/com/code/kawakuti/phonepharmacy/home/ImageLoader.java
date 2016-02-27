@@ -1,4 +1,4 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.home;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

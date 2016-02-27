@@ -1,4 +1,4 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.home;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.code.kawakuti.phonepharmacy.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

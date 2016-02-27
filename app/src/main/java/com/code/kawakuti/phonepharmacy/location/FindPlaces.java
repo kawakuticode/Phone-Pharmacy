@@ -1,4 +1,4 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.location;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.code.kawakuti.phonepharmacy.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -32,20 +33,39 @@ public class FindPlaces extends AppCompatActivity implements LocationListener {
     private GpsTracker gpsTracker;
     private LocationManager locationManager;
     private Location location;
-
-    private ConnectionDectector connectionDectector;
+    private Context mContext;
+    private boolean isGPSEnabled, isNetworkEnabled;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.findplaces);
-
-
         initCompo(savedInstanceState);
         gpsTracker = new GpsTracker(this);
-        connectionDectector = new ConnectionDectector(this);
 
+
+
+        isGPSEnabled = gpsTracker.myLocationManager().isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        isNetworkEnabled = gpsTracker.myLocationManager().isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if (isGPSEnabled && isNetworkEnabled) {
+            initMap();
+            new GetPlaces(FindPlaces.this,
+                    type_of_place).execute();
+
+        } else {
+
+            gpsTracker.turnGPSWifi();
+            gpsTracker.showGpsSettingsAlert();
+            return;
+        }
+
+
+    }
+
+    public void initMap() {
         try {
             if (mMap == null) {
                 mMap = ((MapFragment) getFragmentManager().
@@ -55,11 +75,7 @@ public class FindPlaces extends AppCompatActivity implements LocationListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        new GetPlaces(FindPlaces.this,
-                type_of_place).execute();
-
     }
-
 
     private void initCompo(Bundle savedInstanceState) {
 
@@ -70,7 +86,6 @@ public class FindPlaces extends AppCompatActivity implements LocationListener {
 
             } else {
                 type_of_place = null;
-
             }
         } else {
             type_of_place = (String) savedInstanceState.getSerializable(("TYPE_OF_PLACE"));
@@ -97,6 +112,7 @@ public class FindPlaces extends AppCompatActivity implements LocationListener {
     public void onProviderDisabled(String provider) {
 
     }
+
     private class GetPlaces extends AsyncTask<ArrayList<Place>, Integer, ArrayList<Place>> {
         private ProgressDialog dialog;
         private Context context;
@@ -112,20 +128,16 @@ public class FindPlaces extends AppCompatActivity implements LocationListener {
         protected ArrayList<Place> doInBackground(ArrayList<Place>... params) {
             PlacesService service = new PlacesService("AIzaSyA-iEtJ1Mqofg3n9WyjxeLTCAZ_68wR06Y");
 
-            if (connectionDectector.isConnectingToInternet()) {
-                if (gpsTracker.canGetLocation()) {
 
-                    location = gpsTracker.getLocation();
-
-                    Log.d(TAG , location.toString() );
-                    if (location != null) {
-                        findPlaces = service.findPlaces(
-                                gpsTracker.getLatitude(), gpsTracker.getLongitude(), type_of_place);
-                    }
+            if (gpsTracker.canGetLocation()) {
+                location = gpsTracker.getLocation();
+                Log.d(TAG, location.toString());
+                if (location != null) {
+                    findPlaces = service.findPlaces(
+                            gpsTracker.getLatitude(), gpsTracker.getLongitude(), type_of_place);
                 }
-            } else {
-                connectionDectector.showSettingsAlertInternet();
             }
+
             return findPlaces;
         }
 

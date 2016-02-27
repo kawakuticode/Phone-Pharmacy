@@ -1,4 +1,4 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.home;
 
 /**
  * Created by Russelius on 01/02/16.

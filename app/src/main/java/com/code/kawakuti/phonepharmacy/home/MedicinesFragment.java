@@ -1,102 +1,129 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.home;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import com.code.kawakuti.phonepharmacy.R;
+import com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler;
 
-/*    private static final int REQUEST_CAMERA = 0;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+
+/**
+ * Created by Russelius on 31/01/16.
+ */
+public class MedicinesFragment extends Fragment {
+
+    private static final int REQUEST_CAMERA = 0;
     private static final int SELECT_FILE = 1;
     private static final String TAG = "PHARMACY";
     private TextView med_name, med_description, edit_name, edit_description;
     private DatePicker expiration_date_picker, edit_expiration_date_picker;
     private String img_source;
-    private Button bt_chooseFile, bt_save, bt_cancel,
-            edit_bt_cancel, edit_bt_update;
+    private Button bt_chooseFile, bt_save, bt_cancel, edit_bt_cancel, edit_bt_update;
     private Calendar mCalendar;
     private int day, month, mYear;
     private ListView medicineListView;
-    private MedicineAdapter medAdapter;
+    private MedicineAdapter medicineAdapter;
     private List<Med> listMeds = new ArrayList<Med>();
     private DataBaseMedsHandler db;
     private ImageLoader loaderImg;
-    private String options[] = new String[]{"Update", "Delete", "Cancel"};*/
-    private ViewPager mViewPager;
+    private String options[] = new String[]{"Update", "Delete", "Cancel"};
+    View rootView;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-       super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate the layout resource that'll be returned
+        rootView = inflater.inflate(R.layout.medicinefragment, container, false);
+        db = new DataBaseMedsHandler(this.getContext());
+        medicineListView = (ListView) rootView.findViewById(R.id.list);
+        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) rootView.findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+        //initCalendar();
+        loaderImg = new ImageLoader();
+        listMeds = db.getAllMedsList();
 
-        MyPageAdapter myPageAdapter = new MyPageAdapter(getSupportFragmentManager(), this);
+        medicineAdapter = new MedicineAdapter(this.getContext(), listMeds, loaderImg);
+        medicineListView.setAdapter(medicineAdapter);
+        registerForContextMenu(medicineListView);
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(myPageAdapter);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        medicineListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                final Med tmpMed = (Med) parent.getItemAtPosition(position);
+                builder.setTitle(tmpMed.getName());
+
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        switch (options[which]) {
+                            case "Update":
+                                Log.d(TAG, "UPDATE _----xxx-> " + tmpMed.toString());
+                                editMed(tmpMed).show();
+
+                                break;
+                            case "Delete":
+                                deleteMed(tmpMed);
+                                Log.d(TAG, "DELETE  ----//> " + tmpMed.toString());
+                                break;
+                            case "Cancel":
+                                Log.d(TAG, "CANCEL ----+> " + tmpMed.toString());
+                                break;
+                        }
+                    }
+                });
+                builder.show();
+                return true;
+            }
+
+        });
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), AddMedicineActivity.class);
+                startActivity(intent);
+
+            }
+        });
+        return rootView;
     }
 
 
-    /*
-           db = new DataBaseMedsHandler(getApplicationContext());
-           medicineListView = (ListView) findViewById(R.id.list);
-           Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-           setSupportActionBar(toolbar);
-           //initCalendar();
-           loaderImg = new ImageLoader();
-
-           listMeds = db.getAllMedsList();
-           medAdapter = new MedicineAdapter(this, listMeds, loaderImg);
-           medicineListView.setAdapter(medAdapter);
-           Log.d("list size begin", listMeds.size() + "");
-           registerForContextMenu(medicineListView);
-
-           final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-           medicineListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-               @Override
-               public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                   final Med tmpMed = (Med) parent.getItemAtPosition(position);
-
-                   builder.setTitle(tmpMed.getName());
-
-                   builder.setItems(options, new DialogInterface.OnClickListener() {
-                       @Override
-                       public void onClick(DialogInterface dialog, int which) {
-
-                           switch (options[which]) {
-                               case "Update":
-                                   Log.d(TAG, "UPDATE _----xxx-> " + tmpMed.toString());
-                                   editMed(tmpMed).show();
-
-                                   break;
-                               case "Delete":
-                                   deleteMed(tmpMed);
-                                   Log.d(TAG, "DELETE  ----//> " + tmpMed.toString());
-                                   break;
-                               case "Cancel":
-                                   Log.d(TAG, "CANCEL ----+> " + tmpMed.toString());
-                                   break;
-                           }
-                       }
-                   });
-                   builder.show();
-                   return true;
-               }
-
-           });
-           FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-           fab.setOnClickListener(new View.OnClickListener() {
-               @Override
-               public void onClick(View view) {
-                   addMedDialog().show();
-
-               }
-           });
-       }
-
     public void initCalendar() {
-
         mCalendar = new GregorianCalendar();
         day = mCalendar.get(Calendar.DAY_OF_MONTH);
         month = mCalendar.get(Calendar.MONTH);
@@ -114,12 +141,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-  /*  public Dialog addMedDialog() {
+    public Dialog addMedDialog() {
 
-        *//*AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);*//*
-        final Dialog builder = new Dialog(this);
+        /*AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);*/
+        final Dialog builder = new Dialog(getContext());
         // Get the layout inflater
-        LayoutInflater inflater = this.getLayoutInflater();
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         builder.setTitle(R.string.dialog_add);
         builder.setContentView(inflater.inflate(R.layout.dialog_addmed, null));
 
@@ -159,20 +186,19 @@ public class MainActivity extends AppCompatActivity {
                     tmp.setSrcImage(img_source);
 
                     if (db.addMed(tmp) > 0) {
-
                         builder.dismiss();
-                        Toast.makeText(getApplicationContext(), "Inserted with Sucess", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Inserted with Sucess", Toast.LENGTH_SHORT).show();
                         displayMeds(listMeds);
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(), "CHECK FIELDS", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "CHECK FIELDS", Toast.LENGTH_SHORT).show();
                 }
             }
         });
         bt_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Cancel Dialog ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Cancel Dialog ", Toast.LENGTH_SHORT).show();
                 builder.cancel();
             }
         });
@@ -185,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void selectImage() {
         final CharSequence[] items = {"Take Photo", "Choose from Library", "Cancel"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
@@ -197,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(
                             Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image*//*");
+                    intent.setType("image/*");
                     startActivityForResult(
                             Intent.createChooser(intent, "Select File"),
                             SELECT_FILE);
@@ -211,12 +237,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+      public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == SELECT_FILE)
-                onSelectFromGalleryResult(data);
+                onSelectFromGalleryResult(data , bt_chooseFile);
             else if (requestCode == REQUEST_CAMERA)
                 onCaptureImageResult(data, bt_chooseFile);
         }
@@ -226,10 +251,8 @@ public class MainActivity extends AppCompatActivity {
         Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-
         File destination = new File(Environment.getExternalStorageDirectory(),
                 System.currentTimeMillis() + ".jpg");
-
         FileOutputStream fo;
         try {
             destination.createNewFile();
@@ -243,79 +266,54 @@ public class MainActivity extends AppCompatActivity {
         }
 
         img_source = destination.getAbsolutePath();
-        changeButtonText(img_source, bt);
+        bt.setText(img_source);
+        //
         // ivImage.setImageBitmap(thumbnail);
     }
 
     public void displayMeds(List<Med> medTemp) {
         medTemp.clear();
         medTemp.addAll(db.getAllMedsList());
-        if (medAdapter == null) {
-            medAdapter = new MedicineAdapter(this, medTemp, loaderImg);
-            ListView listView = (ListView) findViewById(R.id.list);
-            listView.setAdapter(medAdapter);
+        if (medicineAdapter == null) {
+            medicineAdapter = new MedicineAdapter(getContext(), medTemp, loaderImg);
+            ListView listView = (ListView) rootView.findViewById(R.id.list);
+            listView.setAdapter(medicineAdapter);
         } else {
-            medAdapter.notifyDataSetChanged();
+            medicineAdapter.notifyDataSetChanged();
         }
     }
 
 
-    public void changeButtonText(String path, Button choose) {
-
+    public String setButtonText(String path) {
+        String result = "";
 
         if (path != null) {
             Log.d(TAG, "=====> path  is not null  ");
             String[] path_parts = path.split("/");
-            choose.setText(path_parts[path_parts.length - 1]);
+            result = path_parts[path_parts.length - 1];
         } else if (path == null) {
             Log.d(TAG, "=====> path  is NULL ");
-
-            choose.setText("select photo");
+            result = "select photo";
         }
+        return result;
     }
 
     @SuppressWarnings("deprecation")
-    private void onSelectFromGalleryResult(Intent data) {
+    private void onSelectFromGalleryResult(Intent data , Button bt) {
         Uri selectedImageUri = data.getData();
         String[] projection = {MediaStore.MediaColumns.DATA};
-        Cursor cursor = managedQuery(selectedImageUri, projection, null, null,
+        Cursor cursor = getContext().getContentResolver().query(selectedImageUri, projection, null, null,
                 null);
+        //managedQuery(selectedImageUri, projection, null, null,
+        //null);
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
         cursor.moveToFirst();
         String selectedImagePath = cursor.getString(column_index);
         img_source = selectedImagePath;
-        changeButtonText(img_source, bt_chooseFile);
-
+        bt.setText(setButtonText(img_source));
 
     }
 
-    public void listMyMeds(List<Med> medicine) {
-        for (Med med : medicine) {
-            Log.d(TAG, med.toString());
-        }
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
@@ -325,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         if (v.getId() == R.id.list) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             menu.setHeaderTitle(listMeds.get(info.position).getName());
-            MenuInflater inflater = getMenuInflater();
+            MenuInflater inflater = (MenuInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             inflater.inflate(R.menu.menu_update_options, menu);
         }
     }
@@ -333,11 +331,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        int menuItemIndex = item.getItemId();
-        //  String[] menuItems = getResources().getStringArray(R.menu.menu_update_options);
-        //   String menuItemName = menuItems[menuItemIndex];
-        // boolean status = false;
         switch (item.getItemId()) {
 
             case R.id.update:
@@ -357,10 +350,10 @@ public class MainActivity extends AppCompatActivity {
 
     public Dialog editMed(final Med med) {
 
-        final Dialog builderEdit = new Dialog(this);
+        final Dialog builderEdit = new Dialog(getContext());
 
         // Get the layout inflater
-        LayoutInflater inflater = (LayoutInflater) MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         builderEdit.setTitle(R.string.dialog_edit);
         builderEdit.setContentView(inflater.inflate(R.layout.dialog_editmed, null));
 
@@ -375,9 +368,16 @@ public class MainActivity extends AppCompatActivity {
 
         edit_name.setText(med.getName());
         edit_description.setText(medChangeDesc(med.getDescription()));
-        changeButtonText(med.getSrcImage(), bt_chooseFile);
-        initCalendarEdit(med);
+        bt_chooseFile.setText(setButtonText(med.getSrcImage()));
 
+        bt_chooseFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectImage();
+            }
+        });
+
+        initCalendarEdit(med);
         edit_expiration_date_picker.init(mYear, month,
                 day, new DatePicker.OnDateChangedListener() {
                     @Override
@@ -388,12 +388,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        bt_chooseFile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectImage();
-            }
-        });
+
 
         edit_bt_update.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -406,7 +401,7 @@ public class MainActivity extends AppCompatActivity {
                 if (db.updateEntry(med) > 0) {
 
                     builderEdit.dismiss();
-                    Toast.makeText(getApplicationContext(), "Updated with Sucess", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Updated with Sucess", Toast.LENGTH_SHORT).show();
                     displayMeds(listMeds);
                 }
             }
@@ -414,13 +409,11 @@ public class MainActivity extends AppCompatActivity {
         edit_bt_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Cancel Dialog ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Cancel Dialog ", Toast.LENGTH_SHORT).show();
                 builderEdit.cancel();
             }
         });
         return builderEdit;
-
-
     }
 
     private String medChangeDesc(String description) {
@@ -434,6 +427,5 @@ public class MainActivity extends AppCompatActivity {
         db.deleteEntry(med.getId());
         displayMeds(listMeds);
 
-    }*/
-
+    }
 }

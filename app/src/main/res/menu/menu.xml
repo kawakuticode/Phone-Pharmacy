@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:appcompat="http://schemas.android.com/apk/res-auto">
+
+ <!--   <item
+        android:id="@+id/menu_item_new"
+        android:title="@string/menu_item_new"
+        appcompat:showAsAction="always"></item>
+    <item
+        android:id="@+id/menu_item_save"
+        android:title="@string/menu_item_save"
+        appcompat:showAsAction="always"></item>
+    <item
+        android:id="@+id/menu_item_delete"
+        android:title="@string/menu_item_delete"
+        appcompat:showAsAction="always"></item>-->
+    <item
+        android:id="@+id/menu_item_rate"
+        android:title="@string/menu_item_rate">
+
+    </item>
+
+    <item
+        android:id="@+id/menu_item_website"
+        android:title="@string/menu_item_website"></item>
+    <item
+        android:id="@+id/menu_item_report"
+        android:title="@string/menu_item_report"></item>
+
+</menu>

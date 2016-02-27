@@ -1,4 +1,4 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.location;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
@@ -23,10 +24,9 @@ public class GpsTracker implements LocationListener {
     boolean isGPSEnabled = false;
     boolean isNetworkEnabled = false;
     boolean canGetLocation = false;
-    Location location; // location
+    Location location; //
     double latitude; // latitude
     double longitude; // longitude
-
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
     protected LocationManager locationManager;
@@ -50,9 +50,10 @@ public class GpsTracker implements LocationListener {
                     .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
             if (!isGPSEnabled && !isNetworkEnabled) {
-                showSettingsAlert();
+                showGpsSettingsAlert();
             } else {
                 this.canGetLocation = true;
+
                 if (isNetworkEnabled) {
                     locationManager.requestLocationUpdates(
                             LocationManager.NETWORK_PROVIDER,
@@ -70,7 +71,7 @@ public class GpsTracker implements LocationListener {
                 }
                 if (isGPSEnabled) {
                     if (location == null) {
-                        if (ActivityCompat.checkSelfPermission(mContext , Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                                 && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                             locationManager.requestLocationUpdates(
                                     LocationManager.GPS_PROVIDER,
@@ -86,7 +87,7 @@ public class GpsTracker implements LocationListener {
                                 }
                             }
                         }
-                        }
+                    }
 
                 }
             }
@@ -134,18 +135,22 @@ public class GpsTracker implements LocationListener {
         return this.canGetLocation;
     }
 
-    public void showSettingsAlert() {
+    public void showGpsSettingsAlert() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 
 // Setting Dialog Title
         alertDialog.setTitle("GPS SETTINGS");
 
 // Setting Dialog Message
-        alertDialog.setMessage("Gps Not Enabled. Want go Settings?! ");
+        alertDialog.setMessage("Gps / Wifi not Enable. Want go Settings?! ");
 
 // On pressing Settings button
-        alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
+
+                turnGPSWifi();
+
+
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 mContext.startActivity(intent);
             }
@@ -178,9 +183,14 @@ public class GpsTracker implements LocationListener {
     public void onStatusChanged(String provider, int status, Bundle extras) {
     }
 
-  /*@Override
-    public IBinder onBind(Intent arg0) {
-        return null;
-    }*/
+    public void turnGPSWifi() {
+        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        wifiManager.setWifiEnabled(true);
+    }
 
+    public LocationManager myLocationManager() {
+        return (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+    }
 }
+
+

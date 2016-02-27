@@ -5,36 +5,73 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.UPDATE_DEVICE_STATS" />
+
 
     <application
         android:allowBackup="true"
+        android:configChanges="orientation|keyboardHidden|screenSize"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".home.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FindPlaces" />
+        <activity android:name=".location.FindPlaces" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA-iEtJ1Mqofg3n9WyjxeLTCAZ_68wR06Y" />
 
         <activity
-            android:name=".TakeMedicineAlarm"
+            android:name=".home.TakeMedicineAlarm"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_take_medicine"
-            android:theme="@style/FullscreenTheme">
-        </activity>
-        <receiver android:name=".BroadCastAlarm" >
+            android:theme="@style/FullscreenTheme" />
+
+        <receiver android:name=".service.BroadCastAlarm" />
+
+        <activity
+            android:name=".preferences.AlarmPreferencesActivity"
+            android:label="@string/app_name" />
+        <activity
+            android:name=".alert.AlarmAlertActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"></activity>
+
+        <service
+            android:name=".service.AlarmService"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:process=".serviceProcess"></service>
+
+        <receiver android:name=".service.AlarmServiceBroadcastReciever">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
         </receiver>
+        <receiver android:name=".alert.AlarmAlertBroadcastReciever" />
+        <receiver android:name=".telephony.PhoneStateChangedBroadcastReciever">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".home.AddMedicineActivity"></activity>
     </application>
 
 </manifest>

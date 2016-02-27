@@ -1,4 +1,4 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.home;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -6,9 +6,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.TextClock;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.Calendar;
+import com.code.kawakuti.phonepharmacy.R;
+import com.code.kawakuti.phonepharmacy.service.BroadCastAlarm;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -27,11 +30,14 @@ public class TakeMedicineAlarm extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.takemedicealarm);
-        time = (TextView) findViewById(R.id.time_content);
+        time = (TextClock) findViewById(R.id.time_content);
         medicine = (TextView) findViewById(R.id.medicine_take);
-        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent tmp = getIntent();
-        setAlarm(tmp.getIntExtra("hour", 0), tmp.getIntExtra("minute", 0));
+
+        /*Intent tmp = getIntent();
+
+        SimpleDateFormat mSDF = new SimpleDateFormat("hh:mm aa");
+        time.setText(mSDF.format(tmp.getStringExtra("time_intent")));*/
+
         findViewById(R.id.button_stop_alarm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -39,6 +45,17 @@ public class TakeMedicineAlarm extends AppCompatActivity {
             }
         });
     }
+
+    private void cancelAlarm() {
+        Intent intent = new Intent(this , BroadCastAlarm.class);
+        PendingIntent sender = PendingIntent.getBroadcast(this, 0,
+                intent, 0);
+        // And cancel the alarm.
+        alarmManager.cancel(sender);
+        // Tell the user about what we did.
+        Toast.makeText(this, "repeating_unscheduled", Toast.LENGTH_LONG).show();
+    }
+
 
     public static TextView getTextTimeView() {
         return time;
@@ -50,20 +67,6 @@ public class TakeMedicineAlarm extends AppCompatActivity {
 
     }
 
-    private void setAlarm(int hour, int minute) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-
-        Intent myIntent = new Intent(this, BroadCastAlarm.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(TakeMedicineAlarm.this, 0, myIntent, 0);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-    }
-
-    private void cancelAlarm() {
-        if (alarmManager != null) {
-            alarmManager.cancel(pendingIntent);
-        }
-    }
 
 }
+

@@ -1,4 +1,4 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,47 +7,54 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.code.kawakuti.phonepharmacy.home.Med;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
- * Created by Russelius on 02/02/16.
+ * Cr   eated by Russelius on 26/01/16.
  */
-public class DataBaseMemoHandler extends SQLiteOpenHelper {
+public class DataBaseMedsHandler extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
-    protected static final String DATABASE_NAME = "MemoDataBase";
+    protected static final String DATABASE_NAME = "MedsDataBase";
     // Name of table
-    private static final String TABLE_NAME = "memo";
+    private static final String TABLE_NAME = "meds";
 
 
     // All Keys used in table
     private static final String KEY_ID = "id";
-    private static final String KEY_NAME = "medicine_to_take";
-    private static final String KEY_TIME = "time";
+    private static final String KEY_NAME = "name";
+    private static final String KEY_DESCRIPTION = "description";
+    private static final String KEY_EXPIREDATE = "expiraDate";
+    private static final String KEY_SRCIMG = "srcImage";
 
 
-    private static final String CREATE_TABLE_MEMO = "CREATE TABLE "
+    private static final String CREATE_TABLE_MEDS = "CREATE TABLE "
             + TABLE_NAME + "(" + KEY_ID
             + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + KEY_NAME + " TEXT,"
-            + KEY_TIME + " TEXT);";
+            + KEY_DESCRIPTION + " TEXT,"
+            + KEY_EXPIREDATE + " DATE,"
+            + KEY_SRCIMG + " TEXT);";
+
     private static final String TAG = " DATA BASE ";
 
-    public DataBaseMemoHandler(Context context) {
+    public DataBaseMedsHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_TABLE_MEMO);
+        db.execSQL(CREATE_TABLE_MEDS);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        String sql = "DROP TABLE IF EXISTS " + CREATE_TABLE_MEMO;
+        String sql = "DROP TABLE IF EXISTS " + CREATE_TABLE_MEDS;
         db.execSQL(sql);
         onCreate(db);
     }
@@ -76,19 +83,19 @@ public class DataBaseMemoHandler extends SQLiteOpenHelper {
     /**
      * This method is used to add Med to Meds Table
      *
-     * @param memo
+     * @param med
      * @return
      */
 
-    public long addMemo(Memo memo) {
+    public long addMed(Med med) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-
         // Creating content values
-        ContentValues values = new  ContentValues();
-        values.put(KEY_NAME, memo.getMedicine_to_take());
-        values.put(KEY_TIME, memo.getTextClock());
-
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, med.getName());
+        values.put(KEY_DESCRIPTION, med.getDescription());
+        values.put(KEY_EXPIREDATE, persistDate(med.getExpireDate()));
+        values.put(KEY_SRCIMG, med.getSrcImage());
 
         // insert row in Meds table
         long insert = db.insert(TABLE_NAME, null, values);
@@ -99,24 +106,26 @@ public class DataBaseMemoHandler extends SQLiteOpenHelper {
     /**
      * This method is used to update particular Med entry
      *
-     * @param memo
+     * @param med
      * @return
      */
-    public int updateEntry(Memo memo) {
+    public int updateEntry(Med med) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Creating content values
         ContentValues values = new ContentValues();
-        values.put(KEY_NAME, memo.getMedicine_to_take());
-        values.put(KEY_TIME, memo.getTextClock());
+        values.put(KEY_NAME, med.getName());
+        values.put(KEY_DESCRIPTION, med.getDescription());
+        values.put(KEY_EXPIREDATE, persistDate(med.getExpireDate()));
+        values.put(KEY_SRCIMG, med.getSrcImage());
 
         // update row in Med table base on med value
         return db.update(TABLE_NAME, values, KEY_ID + " = ?",
-                new String[]{String.valueOf(memo.getId())});
+                new String[]{String.valueOf(med.getId())});
     }
 
     /**
-     * Used to delete particular memo entry
+     * Used to delete particular student entry
      *
      * @param id
      */
@@ -128,13 +137,13 @@ public class DataBaseMemoHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Used to get particular memo details
+     * Used to get particular student details
      *
      * @param id
      * @return
      */
 
-    public Memo getMemo(long id) {
+    public Med getMed(long id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String selectQuery = "SELECT  * FROM " + TABLE_NAME + " WHERE "
@@ -146,22 +155,24 @@ public class DataBaseMemoHandler extends SQLiteOpenHelper {
 
         if (c != null)
             c.moveToFirst();
-        Memo memo = new Memo();
-        memo.setId(c.getInt(c.getColumnIndex(KEY_ID)));
-        memo.setMedicine_to_take(c.getString(c.getColumnIndex(KEY_NAME)));
-        memo.setTextClock(c.getString(c.getColumnIndex(KEY_TIME)));
+        Med med = new Med();
+        med.setId(c.getInt(c.getColumnIndex(KEY_ID)));
+        med.setName(c.getString(c.getColumnIndex(KEY_NAME)));
+        med.setDescription(c.getString(c.getColumnIndex(KEY_DESCRIPTION)));
+        med.setExpireDate(loadDate(c, c.getColumnIndex(KEY_EXPIREDATE)));
+        med.setSrcImage(c.getString(c.getColumnIndex(KEY_SRCIMG)));
 
-        return memo;
+        return med;
     }
 
     /**
-     * Used to get detail of entire database and save in array list of data type
+     * Used to get detail of entire com.code.kawakuti.phonepharmacy.database and save in array list of data type
      * Med
      *
      * @return
      */
-    public List<Memo> getAllMemoList() {
-        List<Memo> memoArrayList = new ArrayList<Memo>();
+    public List<Med> getAllMedsList() {
+        List<Med> medsArrayList = new ArrayList<Med>();
         String selectQuery = "SELECT  * FROM " + TABLE_NAME;
         Log.d(TAG, selectQuery);
 
@@ -171,15 +182,17 @@ public class DataBaseMemoHandler extends SQLiteOpenHelper {
         // looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
-                Memo memo = new Memo();
-                memo.setId(c.getInt(c.getColumnIndex(KEY_ID)));
-                memo.setMedicine_to_take(c.getString(c.getColumnIndex(KEY_NAME)));
-                memo.setTextClock(c.getString(c.getColumnIndex(KEY_TIME)));
-
-                memoArrayList.add(memo);
+                Med med = new Med();
+                med.setId(c.getInt(c.getColumnIndex(KEY_ID)));
+                med.setName(c.getString(c.getColumnIndex(KEY_NAME)));
+                med.setDescription(c.getString(c.getColumnIndex(KEY_DESCRIPTION)));
+                med.setExpireDate(loadDate(c, c.getColumnIndex(KEY_EXPIREDATE)));
+                med.setSrcImage(c.getString(c.getColumnIndex(KEY_SRCIMG)));
+                // adding to meds list
+                medsArrayList.add(med);
             } while (c.moveToNext());
         }
-        return memoArrayList;
+        return medsArrayList;
     }
-
 }
+

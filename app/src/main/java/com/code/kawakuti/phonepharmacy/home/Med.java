@@ -1,6 +1,7 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.home;
 
 
+import java.io.Serializable;
 import java.util.Date;
 
 ;
@@ -8,7 +9,7 @@ import java.util.Date;
 /**
  * Created by Russelius on 26/01/16.
  */
-public class Med {
+public class Med implements Serializable{
 
     private int id;
     private String name;

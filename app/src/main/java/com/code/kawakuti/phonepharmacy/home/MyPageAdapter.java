@@ -1,9 +1,12 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.home;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+
+import com.code.kawakuti.phonepharmacy.location.FindHospitalFragment;
+import com.code.kawakuti.phonepharmacy.location.FindPharmacyFragment;
 
 /**
  * Created by Russelius on 31/01/16.
@@ -28,14 +31,14 @@ public class MyPageAdapter extends FragmentPagerAdapter {
                 return new MedicinesFragment();
 
             case 1:
-                return new MemoRecipsFragment();
+                return  new AlarmActivity();
+               /* return new MemoRecipsFragment();*/
 
             case 2:
                 return new FindPharmacyFragment();
             case 3:
                 return new FindHospitalFragment();
             default:
-
                 return new MedicinesFragment();
 
         }

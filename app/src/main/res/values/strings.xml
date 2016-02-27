@@ -6,7 +6,7 @@
     <string name="cancel">cancel</string>
     <string name="description_text">medicine description</string>
     <string name="name_med">name of medicine</string>
-    <string name="choose_photo">select photo</string>
+    <string name="select_photo">select photo</string>
     <string name="pick_date">set expiration date</string>
     <string name="currentDir">Current Dir</string>
     <string name="fileSize">File Size</string>
@@ -32,4 +32,16 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="close_alarm">stop alarm</string>
+    <string name="no_alarms">No Alarms</string>
+    <string name="menu_item_new">new</string>
+    <string name="menu_item_save">save</string>
+    <string name="menu_item_delete">delete</string>
+    <string name="menu_item_rate">rate</string>
+    <string name="menu_item_website">website</string>
+    <string name="menu_item_report">report</string>
+    <string name="stop_alarm"> Stop Alarm </string>
+    <string name="schedule_med">TIME TO TAKE MEDICINE</string>
+    <string name="hint_description">add description</string>
+    <string name="hint_medicine_name">med name</string>
+    <string name="err_msg_name">please add med name</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.location;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,24 +10,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.code.kawakuti.phonepharmacy.R;
+import com.code.kawakuti.phonepharmacy.home.ImageLoader;
 
 public class FindPharmacyFragment extends Fragment {
 
-   private  ImageLoader l;
+   private ImageLoader l;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout resource that'll be returned
         View rootView = inflater.inflate(R.layout.findpharmacy, container, false);
 
-        // Get the arguments that was supplied when
-        // the fragment was instantiated in the
-        // CustomPagerAdapter
+
 
         l = new ImageLoader();
         Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.farmacy);
         Bitmap circularBitmap = l.getRoundedCornerBitmap(bitmap, 100);
-
         ImageView circularImageView = (ImageView)rootView.findViewById(R.id.circleView);
         circularImageView.setImageBitmap(circularBitmap);
 
@@ -36,7 +35,6 @@ public class FindPharmacyFragment extends Fragment {
         circularImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Searching for pharmacies" , Toast.LENGTH_SHORT).show();
                 Intent findplaces = new Intent(getContext(), FindPlaces.class);
                     findplaces.putExtra("TYPE_OF_PLACE", "pharmacy");
                 startActivity(findplaces);

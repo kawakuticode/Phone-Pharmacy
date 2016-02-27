@@ -2,13 +2,6 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
-    <!--<ImageView
-        android:src="@drawable/header_logo"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:scaleType="center"
-        android:background="#FFFFBB33"
-        android:contentDescription="@string/app_name" />-->
     <EditText
         android:id="@+id/name"
         android:layout_width="match_parent"
@@ -58,7 +51,7 @@
     <Button
         android:id="@+id/imgSrc"
         android:fontFamily="sans-serif"
-        android:text="@string/choose_photo"
+        android:text="@string/select_photo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"

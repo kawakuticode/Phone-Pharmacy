@@ -1,4 +1,4 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.location;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.code.kawakuti.phonepharmacy.R;
+import com.code.kawakuti.phonepharmacy.home.ImageLoader;
 
 /**
  * Created by Russelius on 01/02/16.

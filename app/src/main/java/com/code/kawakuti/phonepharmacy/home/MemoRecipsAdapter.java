@@ -1,4 +1,4 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.home;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,7 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import com.code.kawakuti.phonepharmacy.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,11 +17,10 @@ import java.util.List;
 public class MemoRecipsAdapter extends BaseAdapter {
 
 
-    private List<Memo> memorecips;
+    private List<Memo> memorecips = new ArrayList<Memo>();
     private Context context;
 
-    public MemoRecipsAdapter(Context context,List<Memo> memorecips) {
-        this.memorecips = memorecips;
+    public MemoRecipsAdapter(Context context) {
         this.context = context;
     }
 
@@ -56,6 +57,11 @@ public class MemoRecipsAdapter extends BaseAdapter {
         viewHolder.medToTake.setText(memorecips.get(position).getMedicine_to_take());
 
         return convertView;
+    }
+
+    public void setAlarms(List<Memo> alarms) {
+
+        this.memorecips = alarms;
     }
 
     /**

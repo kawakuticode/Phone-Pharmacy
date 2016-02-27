@@ -1,4 +1,4 @@
-package com.code.kawakuti.phonepharmacy;
+package com.code.kawakuti.phonepharmacy.service;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +7,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.widget.Toast;
+
+import com.code.kawakuti.phonepharmacy.home.TakeMedicineAlarm;
 
 /**
  * Created by Russelius on 02/02/16.
