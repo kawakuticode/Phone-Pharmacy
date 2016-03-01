@@ -9,6 +9,7 @@
         android:id="@+id/checkBox_alarm_active"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:buttonTint="#4871ec"
         android:focusable="false"
         android:padding="5dp" />
 
@@ -32,6 +33,7 @@
             android:id="@+id/text_medicine"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textStyle="bold"
             android:textAppearance="?android:attr/textAppearanceMedium"
             />
 

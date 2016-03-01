@@ -14,17 +14,22 @@
         android:layout_height="wrap_content"
         android:src="@drawable/hospitalx"
         android:id="@+id/circleHospital"
+        android:background="@drawable/img_selector"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_centerHorizontal="true"
+        android:clickable="true"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/find_hospital"
+        android:paddingTop="10dp"
         android:id="@+id/textView"
+        android:textColor="#FFFFFF"
         android:textSize="@dimen/text_size"
-        android:layout_alignParentBottom="true"
+        android:textStyle="bold"
+        android:layout_below="@+id/circleHospital"
         android:layout_centerHorizontal="true" />
 
 

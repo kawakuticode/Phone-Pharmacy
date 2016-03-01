@@ -62,7 +62,7 @@ public abstract class BaseActivity  extends ActionBarActivity implements android
 			}
 			break;
 		case R.id.menu_item_website:
-			url = "http://www.neilson.co.za";
+			url = "http://www.kawakuticode.com";
 			intent = new Intent(Intent.ACTION_VIEW);
 			intent.setData(Uri.parse(url));
 			try {
@@ -72,7 +72,7 @@ public abstract class BaseActivity  extends ActionBarActivity implements android
 			}
 			break;
 		case R.id.menu_item_report:
-			url = "https://github.com/SheldonNeilson/Android-com.code.kawakuti.phonepharmacy.home.Alarm-Clock/issues";
+			url = "https://github.com/kawakuticode/Phone-Pharmacy/issues";
 			intent = new Intent(Intent.ACTION_VIEW);
 			intent.setData(Uri.parse(url));
 			try {
@@ -80,14 +80,13 @@ public abstract class BaseActivity  extends ActionBarActivity implements android
 			} catch (ActivityNotFoundException e) {
 				Toast.makeText(this, "Couldn't launch the bug reporting website", Toast.LENGTH_LONG).show();
 			}
-
 			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	protected void callMathAlarmScheduleService() {
-		Intent mathAlarmServiceIntent = new Intent(this, AlarmServiceBroadcastReciever.class);
-		sendBroadcast(mathAlarmServiceIntent, null);
+	protected void callAlarmScheduleService() {
+		Intent AlarmServiceIntent = new Intent(this, AlarmServiceBroadcastReciever.class);
+		sendBroadcast(AlarmServiceIntent, null);
 	}
 }

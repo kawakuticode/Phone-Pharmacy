@@ -71,7 +71,7 @@ public class MedicinesFragment extends Fragment {
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) rootView.findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
         //initCalendar();
-        loaderImg = new ImageLoader();
+        loaderImg = new ImageLoader(this.getContext());
         listMeds = db.getAllMedsList();
 
         medicineAdapter = new MedicineAdapter(this.getContext(), listMeds, loaderImg);
@@ -148,12 +148,12 @@ public class MedicinesFragment extends Fragment {
         // Get the layout inflater
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         builder.setTitle(R.string.dialog_add);
-        builder.setContentView(inflater.inflate(R.layout.dialog_addmed, null));
+   /*     builder.setContentView(inflater.inflate(R.layout.dialog_addmed, null));
 
         med_name = (TextView) builder.findViewById(R.id.name);
         med_description = (TextView) builder.findViewById(R.id.description);
         expiration_date_picker = (DatePicker) builder.findViewById(R.id.expiration_date);
-        bt_chooseFile = (Button) builder.findViewById(R.id.imgSrc);
+        bt_chooseFile = (Button) builder.findViewById(R.id.imgSrc);*/
         bt_save = (Button) builder.findViewById(R.id.save);
         bt_cancel = (Button) builder.findViewById(R.id.cancel);
 
@@ -271,17 +271,40 @@ public class MedicinesFragment extends Fragment {
         // ivImage.setImageBitmap(thumbnail);
     }
 
-    public void displayMeds(List<Med> medTemp) {
+    public void displayMeds(final List <Med> medTemp) {
         medTemp.clear();
         medTemp.addAll(db.getAllMedsList());
-        if (medicineAdapter == null) {
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                if (medicineAdapter == null) {
+                    medicineAdapter = new MedicineAdapter(getContext(), medTemp, loaderImg);
+                    ListView listView = (ListView) rootView.findViewById(R.id.list);
+                    listView.setAdapter(medicineAdapter);
+                } else {
+                    medicineAdapter.notifyDataSetChanged();
+                }
+                // reload content
+
+              /*  if (alarms.size() > 0) {
+                    rootView.findViewById(android.R.id.empty).setVisibility(View.INVISIBLE);
+                } else {
+                    rootView.findViewById(android.R.id.empty).setVisibility(View.VISIBLE);
+                }*/
+            }
+        });
+    }
+    /*    if (medicineAdapter == null) {
             medicineAdapter = new MedicineAdapter(getContext(), medTemp, loaderImg);
             ListView listView = (ListView) rootView.findViewById(R.id.list);
             listView.setAdapter(medicineAdapter);
         } else {
             medicineAdapter.notifyDataSetChanged();
-        }
-    }
+        }*/
+
+
+
+
+
 
 
     public String setButtonText(String path) {
@@ -310,7 +333,7 @@ public class MedicinesFragment extends Fragment {
         cursor.moveToFirst();
         String selectedImagePath = cursor.getString(column_index);
         img_source = selectedImagePath;
-        bt.setText(setButtonText(img_source));
+
 
     }
 
@@ -424,7 +447,7 @@ public class MedicinesFragment extends Fragment {
     }
 
     public void deleteMed(Med med) {
-        db.deleteEntry(med.getId());
+         db.deleteEntry(med.getId());
         displayMeds(listMeds);
 
     }

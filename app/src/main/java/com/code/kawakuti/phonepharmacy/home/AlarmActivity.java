@@ -54,7 +54,6 @@ public class AlarmActivity extends Fragment implements View.OnClickListener{
 						DataBaseAlarmsHandler.init(getContext());
 						DataBaseAlarmsHandler.deleteEntry(alarm);
 						AlarmActivity.this.callMathAlarmScheduleService();
-
 						updateAlarmList();
 					}
 				});

@@ -28,7 +28,7 @@ public class FindHospitalFragment extends android.support.v4.app.Fragment {
         // the fragment was instantiated in the
         // CustomPagerAdapter
 
-        l = new ImageLoader();
+        l = new ImageLoader(this.getContext());
         Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.hospitalx);
         Bitmap circularBitmap = l.getRoundedCornerBitmap(bitmap, 100);
 

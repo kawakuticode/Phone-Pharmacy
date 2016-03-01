@@ -24,7 +24,7 @@ public class FindPharmacyFragment extends Fragment {
 
 
 
-        l = new ImageLoader();
+        l = new ImageLoader(this.getContext());
         Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.farmacy);
         Bitmap circularBitmap = l.getRoundedCornerBitmap(bitmap, 100);
         ImageView circularImageView = (ImageView)rootView.findViewById(R.id.circleView);

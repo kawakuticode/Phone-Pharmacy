@@ -50,7 +50,7 @@ public class MedicineAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            LayoutInflater inflater = LayoutInflater.from(context);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.medicinerow, parent, false);
             viewHolder.img = (ImageView) convertView.findViewById(R.id.list_image);
             viewHolder.med_name = (TextView) convertView.findViewById(R.id.med_name);
@@ -61,7 +61,7 @@ public class MedicineAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.img.setImageBitmap(imageLoader.setMedicineImage(medicines.get(position).getSrcImage() , 100));
+        viewHolder.img.setImageBitmap(imageLoader.setMedicineImage(medicines.get(position).getSrcImage() , 80));
         viewHolder.med_name.setText(medicines.get(position).getName());
         viewHolder.description.setText(medicines.get(position).getDescription());
         if (medicines.get(position).getExpireDate() != null) {

@@ -17,7 +17,6 @@
 
     <application
         android:allowBackup="true"
-        android:configChanges="orientation|keyboardHidden|screenSize"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -35,11 +34,11 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA-iEtJ1Mqofg3n9WyjxeLTCAZ_68wR06Y" />
+            android:value="AIzaSyA-iEtJ1Mqofg3n9WyjxeLTCAZ_68wR06Y"/>
 
         <activity
             android:name=".home.TakeMedicineAlarm"
-            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_take_medicine"
             android:theme="@style/FullscreenTheme" />
 
@@ -71,7 +70,11 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".home.AddMedicineActivity"></activity>
+        <activity
+            android:name=".home.AddMedicineActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize">
+
+        </activity>
     </application>
 
 </manifest>

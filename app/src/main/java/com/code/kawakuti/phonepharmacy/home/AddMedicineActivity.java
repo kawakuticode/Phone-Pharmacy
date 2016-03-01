@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -23,18 +24,30 @@ import android.widget.Toast;
 import com.code.kawakuti.phonepharmacy.R;
 import com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Set;
 
 
 public class AddMedicineActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String LOG_TAG = "ADD MEDICINE ACTIVITY" ;
+    private static final String LOG_TAG = "ADD MEDICINE ACTIVITY";
+    private static final String FILE_PATH = "path";
     private TextView medicine_name, medicine_descr;
     private TextInputLayout inputLayoutMed, inputLayoutDesc;
     private static final int REQUEST_CAMERA = 0;
     private static final int SELECT_FILE = 1;
+
+    // Activity request codes
+    private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
+    public static final int MEDIA_TYPE_IMAGE = 1;
+    // directory name to store captured images and videos
+    private static final String IMAGE_DIRECTORY_NAME = "Phone Pharmacy";
+    private Uri fileUri; // file url to store image/video
 
     private Button btn_selectPhoto, btn_save, btn_cancel;
     private DatePicker expiration_date_picker;
@@ -50,6 +63,7 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.add_medicine_);
         initCalendar();
         initFields();
+
     }
 
     public void initCalendar() {
@@ -80,8 +94,6 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 mCalendar.set(year, monthOfYear + 1, dayOfMonth);
-                // Log.d(TAG, mCalendar.get(Calendar.DAY_OF_MONTH) + " "
-                //       + mCalendar.get(Calendar.MONTH) + " " + mCalendar.get(Calendar.YEAR));
             }
         });
     }
@@ -104,8 +116,6 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void submitForm() {
-
-
         if (validateMedName()) {
 
             Med tmp = new Med();
@@ -129,8 +139,7 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals("Take Photo")) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, REQUEST_CAMERA);
+                    captureImage();
                 } else if (items[item].equals("Choose from Library")) {
                     Intent intent = new Intent(
                             Intent.ACTION_PICK,
@@ -146,6 +155,7 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
         });
         builder.show();
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -154,34 +164,57 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
 
             if (requestCode == SELECT_FILE) {
                 onSelectFromGallery(data);
-            }
-            else if (requestCode == REQUEST_CAMERA) {
-                onCaptureImage(data);
+            } else if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
+                previewCapturedImage();
             }
         }
     }
 
-    private void onCaptureImage(Intent data) {
+    private void captureImage() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        // start the image capture Intent
+        startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
+    }
 
-        String log = "---> Capture Image " ;
-       // thumbnail.toString();
-        dumpIntent(data , log);
+
+    private void previewCapturedImage() {
+        try {
+            img_source = fileUri.getPath();
+            btn_selectPhoto.setText(changeButtonTextToPath(img_source));
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 
     private void onSelectFromGallery(Intent data) {
 
         Uri selectedImageUri = data.getData();
         String[] projection = {MediaStore.MediaColumns.DATA};
-        Cursor cursor =this.getContentResolver().query(selectedImageUri, projection, null, null,
+        Cursor cursor = this.getContentResolver().query(selectedImageUri, projection, null, null,
                 null);
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
         cursor.moveToFirst();
         String selectedImagePath = cursor.getString(column_index);
         img_source = selectedImagePath;
+        btn_selectPhoto.setText(changeButtonTextToPath(img_source));
 
     }
 
-    public static void dumpIntent(Intent i , String log){
+
+    private String changeButtonTextToPath(String path) {
+        String result = "";
+        if (path != null) {
+            String[] path_parts = path.split("/");
+            result = path_parts[path_parts.length - 1];
+        } else if (path == null) {
+            result = "select photo";
+        }
+        return result;
+    }
+
+    public static void dumpIntent(Intent i, String log) {
 
         Bundle bundle = i.getExtras();
         if (bundle != null) {
@@ -190,10 +223,47 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
             Log.e(LOG_TAG + log, "Dumping Intent start");
             while (it.hasNext()) {
                 String key = it.next();
-                Log.e(LOG_TAG + log,"[" + key + "=" + bundle.get(key)+"]");
+                Log.e(LOG_TAG + log, "[" + key + "=" + bundle.get(key) + "]");
             }
-            Log.e(LOG_TAG + log,"Dumping Intent end");
+            Log.e(LOG_TAG + log, "Dumping Intent end");
         }
+    }
+
+
+    /*
+    * Here we store the file url as it will be null after returning from camera
+    * app
+    */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // save file url in bundle as it will be null on scren orientation
+        // changes
+        outState.putParcelable("file_uri", fileUri);
+        outState.putSerializable("calendar_state", mCalendar);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // get the file url
+        fileUri = savedInstanceState.getParcelable("file_uri");
+        mCalendar = (Calendar) savedInstanceState.getSerializable("calendar_state");
+    }
+
+
+    @Override
+    protected void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+    }
+
+
+    @Override
+    protected void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
     }
 
     @Override
@@ -217,6 +287,52 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
         }
 
     }
+
+
+    /**
+     * ------------ Helper Methods ----------------------
+     */
+
+	/*
+     * Creating file uri to store image/video
+	 */
+    public Uri getOutputMediaFileUri(int type) {
+        return Uri.fromFile(getOutputMediaFile(type));
+    }
+
+    /*
+     * returning image / video
+     */
+    private static File getOutputMediaFile(int type) {
+
+        // External sdcard location
+        File mediaStorageDir = new File(
+                Environment
+                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                IMAGE_DIRECTORY_NAME);
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d(IMAGE_DIRECTORY_NAME, "Oops! Failed create "
+                        + IMAGE_DIRECTORY_NAME + " directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
+                Locale.getDefault()).format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator
+                    + "IMG_" + timeStamp + ".jpg");
+        } else {
+            return null;
+        }
+        return mediaFile;
+    }
+
 
     private class MyTextWatcher implements TextWatcher {
 
