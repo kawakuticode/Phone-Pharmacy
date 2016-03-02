@@ -28,15 +28,15 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Locale;
-import java.util.Set;
 
 
 public class AddMedicineActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String LOG_TAG = "ADD MEDICINE ACTIVITY";
-    private static final String FILE_PATH = "path";
+    private static final String FILENAME = "IMG_";
+    private static final String FILETYPE = ".JPG";
+
     private TextView medicine_name, medicine_descr;
     private TextInputLayout inputLayoutMed, inputLayoutDesc;
     private static final int REQUEST_CAMERA = 0;
@@ -214,22 +214,6 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
         return result;
     }
 
-    public static void dumpIntent(Intent i, String log) {
-
-        Bundle bundle = i.getExtras();
-        if (bundle != null) {
-            Set<String> keys = bundle.keySet();
-            Iterator<String> it = keys.iterator();
-            Log.e(LOG_TAG + log, "Dumping Intent start");
-            while (it.hasNext()) {
-                String key = it.next();
-                Log.e(LOG_TAG + log, "[" + key + "=" + bundle.get(key) + "]");
-            }
-            Log.e(LOG_TAG + log, "Dumping Intent end");
-        }
-    }
-
-
     /*
     * Here we store the file url as it will be null after returning from camera
     * app
@@ -282,27 +266,15 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
             case R.id.cancel:
                 finish();
                 break;
-
-
         }
 
     }
 
 
-    /**
-     * ------------ Helper Methods ----------------------
-     */
-
-	/*
-     * Creating file uri to store image/video
-	 */
     public Uri getOutputMediaFileUri(int type) {
         return Uri.fromFile(getOutputMediaFile(type));
     }
 
-    /*
-     * returning image / video
-     */
     private static File getOutputMediaFile(int type) {
 
         // External sdcard location
@@ -326,7 +298,7 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
         File mediaFile;
         if (type == MEDIA_TYPE_IMAGE) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                    + "IMG_" + timeStamp + ".jpg");
+                    + FILENAME + timeStamp + FILETYPE);
         } else {
             return null;
         }
@@ -359,12 +331,6 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
                 case R.id.input_name_med:
                     validateMedName();
                     break;
-              /*  case R.id.input_description:
-                    validateDescription();
-                    break;
-                case R.id.expiration_date:
-                    validateDate();
-                    break;*/
             }
 
         }

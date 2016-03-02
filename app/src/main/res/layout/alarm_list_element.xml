@@ -3,7 +3,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="5dp">
+    android:background="@drawable/list_selector"
+   >
 
     <CheckBox
         android:id="@+id/checkBox_alarm_active"
@@ -11,7 +12,7 @@
         android:layout_height="wrap_content"
         android:buttonTint="#4871ec"
         android:focusable="false"
-        android:padding="5dp" />
+       />
 
     <View
         android:id="@+id/view1"
@@ -19,7 +20,7 @@
         android:layout_height="match_parent"
         android:layout_marginRight="10dp"
         android:background="#CCCCCC"
-        android:paddingRight="10dp" />
+        />
 
     <LinearLayout
         android:layout_width="wrap_content"

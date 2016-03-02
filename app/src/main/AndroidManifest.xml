@@ -14,7 +14,6 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.UPDATE_DEVICE_STATS" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -34,7 +33,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA-iEtJ1Mqofg3n9WyjxeLTCAZ_68wR06Y"/>
+            android:value="AIzaSyA-iEtJ1Mqofg3n9WyjxeLTCAZ_68wR06Y" />
 
         <activity
             android:name=".home.TakeMedicineAlarm"
@@ -50,13 +49,13 @@
         <activity
             android:name=".alert.AlarmAlertActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".service.AlarmService"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:process=".serviceProcess"></service>
+            android:process=".serviceProcess" />
 
         <receiver android:name=".service.AlarmServiceBroadcastReciever">
             <intent-filter>
@@ -72,9 +71,8 @@
 
         <activity
             android:name=".home.AddMedicineActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize">
-
-        </activity>
+            android:configChanges="orientation|keyboardHidden|screenSize"></activity>
+        <activity android:name=".home.UpdateMedicineActivity"></activity>
     </application>
 
 </manifest>
