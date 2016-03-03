@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.code.kawakuti.phonepharmacy.R;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +21,7 @@ import java.util.List;
  */
 public class MedicineAdapter extends BaseAdapter {
 
-    private List<Med> medicines;
+    private List<Med> medicines = new ArrayList<Med>();
     private Context context;
     private ImageLoader imageLoader;
 
@@ -29,6 +30,7 @@ public class MedicineAdapter extends BaseAdapter {
         this.context = context;
         this.imageLoader = imageL;
     }
+
 
     @Override
     public int getCount() {
@@ -60,18 +62,18 @@ public class MedicineAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-
-        viewHolder.img.setImageBitmap(imageLoader.setMedicineImage(medicines.get(position).getSrcImage() , 80));
-        viewHolder.med_name.setText(medicines.get(position).getName());
-        viewHolder.description.setText(medicines.get(position).getDescription());
-        if (medicines.get(position).getExpireDate() != null) {
-            switch (verifyDate(medicines.get(position).getExpireDate())) {
+        Med medicine = (Med) getItem(position);
+        viewHolder.img.setImageBitmap(imageLoader.setMedicineImage(medicine.getSrcImage(), 80));
+        viewHolder.med_name.setText(medicine.getName());
+        viewHolder.description.setText(medicine.getDescription());
+        if (medicine.getExpireDate() != null) {
+            switch (verifyDate(medicine.getExpireDate())) {
                 case 0:
                     viewHolder.exp_date.setTextColor(Color.RED);
-                    viewHolder.exp_date.setText(convertStringToDate(medicines.get(position).getExpireDate()));
+                    viewHolder.exp_date.setText(convertStringToDate(medicine.getExpireDate()));
                     break;
                 case 1:
-                    viewHolder.exp_date.setText(convertStringToDate(medicines.get(position).getExpireDate()));
+                    viewHolder.exp_date.setText(convertStringToDate(medicine.getExpireDate()));
                     break;
             }
         }
@@ -93,6 +95,10 @@ public class MedicineAdapter extends BaseAdapter {
             ex.printStackTrace();
         }
         return dateString;
+    }
+
+    public void setMedicines(List<Med> medicines) {
+        this.medicines = medicines;
     }
 
     /**

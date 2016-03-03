@@ -71,19 +71,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
-            android:layout_above="@+id/expiration_date"
-            android:layout_alignStart="@+id/expiration_date" />
-
-        <DatePicker
-            android:id="@+id/update_expiration_date"
-            android:layout_width="wrap_content"
-            android:layout_height="162dp"
-            android:layout_gravity="center_horizontal"
-            android:fontFamily="sans-serif"
-            android:datePickerMode="spinner"
-            android:calendarViewShown="false"
-            android:layout_above="@+id/btn_add_photo"
-            android:layout_centerHorizontal="true" />
+            android:layout_below="@+id/update_layout_description"
+            android:layout_alignParentStart="true" />
 
         <Button
             android:id="@+id/update_btn_add_photo"
@@ -143,6 +132,17 @@
                 android:shadowDx="4"
                 android:shadowDy="-4"/>
         </LinearLayout>
+
+        <DatePicker
+            android:id="@+id/update_expiration_date"
+            android:layout_width="wrap_content"
+            android:layout_height="162dp"
+            android:layout_gravity="center_horizontal"
+            android:fontFamily="sans-serif"
+            android:datePickerMode="spinner"
+            android:calendarViewShown="false"
+            android:layout_above="@+id/update_btn_add_photo"
+            android:layout_centerHorizontal="true" />
 
     </RelativeLayout>
 

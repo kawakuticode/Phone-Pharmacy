@@ -15,7 +15,6 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -268,11 +267,7 @@ public class AlarmPreferencesActivity extends BaseActivity {
         return txt.getText().toString().trim().isEmpty() ? false : true;
     }
 
-    private void requestFocus(View view) {
-        if (view.requestFocus()) {
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        }
-    }
+
 
     private CountDownTimer alarmToneTimer;
 

@@ -36,17 +36,19 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
     private static final String LOG_TAG = "ADD MEDICINE ACTIVITY";
     private static final String FILENAME = "IMG_";
     private static final String FILETYPE = ".JPG";
-
-    private TextView medicine_name, medicine_descr;
-    private TextInputLayout inputLayoutMed, inputLayoutDesc;
-    private static final int REQUEST_CAMERA = 0;
     private static final int SELECT_FILE = 1;
-
     // Activity request codes
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
     public static final int MEDIA_TYPE_IMAGE = 1;
     // directory name to store captured images and videos
     private static final String IMAGE_DIRECTORY_NAME = "Phone Pharmacy";
+
+
+    private TextView medicine_name, medicine_descr;
+    private TextInputLayout inputLayoutMed, inputLayoutDesc;
+
+
+
     private Uri fileUri; // file url to store image/video
 
     private Button btn_selectPhoto, btn_save, btn_cancel;
@@ -61,6 +63,7 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_medicine_);
+        db = new DataBaseMedsHandler(this.getBaseContext());
         initCalendar();
         initFields();
 
@@ -75,7 +78,6 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
 
     public void initFields() {
 
-        db = new DataBaseMedsHandler(this.getBaseContext());
         inputLayoutMed = (TextInputLayout) findViewById(R.id.input_layout_name);
         inputLayoutDesc = (TextInputLayout) findViewById(R.id.input_layout_description);
         medicine_name = (TextView) findViewById(R.id.input_name_med);

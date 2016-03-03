@@ -41,10 +41,10 @@ public class AlarmListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View view, ViewGroup viewGroup) {
+    public View getView(int position, View view, ViewGroup parent) {
         if (null == view)
             view = LayoutInflater.from(alarmActivity.getContext()).inflate(
-                    R.layout.alarm_list_element, null);
+                    R.layout.alarm_list_element, parent, false);
 
         Alarm alarm = (Alarm) getItem(position);
 

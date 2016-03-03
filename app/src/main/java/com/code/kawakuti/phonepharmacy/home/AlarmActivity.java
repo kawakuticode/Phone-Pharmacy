@@ -93,7 +93,7 @@ public class AlarmActivity extends Fragment implements View.OnClickListener{
 
 				Toast.makeText(getContext(), "add alarm to take medicine", Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent(getContext(), AlarmPreferencesActivity.class);
-				startActivity(intent);
+					startActivity(intent);
 
 			}
 		});
