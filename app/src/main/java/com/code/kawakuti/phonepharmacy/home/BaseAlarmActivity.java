@@ -16,7 +16,7 @@ import com.code.kawakuti.phonepharmacy.service.AlarmServiceBroadcastReciever;
 
 import java.lang.reflect.Field;
 
-public abstract class BaseActivity  extends ActionBarActivity implements android.view.View.OnClickListener{
+public abstract class BaseAlarmActivity extends ActionBarActivity implements android.view.View.OnClickListener{
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +47,6 @@ public abstract class BaseActivity  extends ActionBarActivity implements android
 		String url = null;
 		Intent intent = null;
 		switch (item.getItemId()) {
-	/*	case R.id.menu_item_new:
-			Intent newAlarmIntent = new Intent(this, AlarmPreferencesActivity.class);
-			startActivity(newAlarmIntent);
-			break;*/
 		case R.id.menu_item_rate:
 			url = "market://details?id=" + getPackageName();
 			intent = new Intent(Intent.ACTION_VIEW);

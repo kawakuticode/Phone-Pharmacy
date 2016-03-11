@@ -29,11 +29,8 @@ public class MyPageAdapter extends FragmentPagerAdapter {
         switch (position) {
             case 0:
                 return new MedicinesFragment();
-
             case 1:
                 return  new AlarmActivity();
-               /* return new MemoRecipsFragment();*/
-
             case 2:
                 return new FindPharmacyFragment();
             case 3:

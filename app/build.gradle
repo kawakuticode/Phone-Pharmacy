@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.1"
     defaultConfig {
         applicationId "com.code.kawakuti.phonepharmacy"
-        minSdkVersion 22
+        minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -28,4 +28,5 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'de.hdodenhof:circleimageview:1.2.1'
     compile 'com.android.support:support-v4:23.1.1'
+    compile files('libs/opencsv-2.3.jar')
 }

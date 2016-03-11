@@ -223,9 +223,6 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        // save file url in bundle as it will be null on scren orientation
-        // changes
         outState.putParcelable("file_uri", fileUri);
         outState.putSerializable("calendar_state", mCalendar);
     }

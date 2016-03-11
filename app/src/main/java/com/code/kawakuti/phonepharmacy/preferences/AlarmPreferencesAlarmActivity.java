@@ -7,12 +7,14 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
+import android.support.v7.app.AppCompatActivity;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,12 +30,12 @@ import android.widget.Toast;
 import com.code.kawakuti.phonepharmacy.R;
 import com.code.kawakuti.phonepharmacy.database.DataBaseAlarmsHandler;
 import com.code.kawakuti.phonepharmacy.home.Alarm;
-import com.code.kawakuti.phonepharmacy.home.BaseActivity;
+import com.code.kawakuti.phonepharmacy.service.AlarmServiceBroadcastReciever;
 
 import java.util.Calendar;
 
 
-public class AlarmPreferencesActivity extends BaseActivity {
+public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements View.OnClickListener{
 
     private Alarm alarm;
     private MediaPlayer mediaPlayer;
@@ -96,11 +98,11 @@ public class AlarmPreferencesActivity extends BaseActivity {
                         break;
                     case STRING:
 
-                        alert = new AlertDialog.Builder(AlarmPreferencesActivity.this);
+                        alert = new AlertDialog.Builder(AlarmPreferencesAlarmActivity.this);
                         alert.setTitle(alarmPreference.getTitle());
 
                         // Set an EditText view to get user input
-                        input = new EditText(AlarmPreferencesActivity.this);
+                        input = new EditText(AlarmPreferencesAlarmActivity.this);
                         input.setText(alarmPreference.getValue().toString());
                         alert.setView(input);
 
@@ -122,7 +124,7 @@ public class AlarmPreferencesActivity extends BaseActivity {
                         alert.show();
                         break;
                     case LIST:
-                        alert = new AlertDialog.Builder(AlarmPreferencesActivity.this);
+                        alert = new AlertDialog.Builder(AlarmPreferencesAlarmActivity.this);
 
                         alert.setTitle(alarmPreference.getTitle());
 
@@ -148,7 +150,7 @@ public class AlarmPreferencesActivity extends BaseActivity {
                                             try {
                                                 // mediaPlayer.setVolume(1.0f, 1.0f);
                                                 mediaPlayer.setVolume(0.2f, 0.2f);
-                                                mediaPlayer.setDataSource(AlarmPreferencesActivity.this, Uri.parse(alarm.getAlarmTonePath()));
+                                                mediaPlayer.setDataSource(AlarmPreferencesAlarmActivity.this, Uri.parse(alarm.getAlarmTonePath()));
                                                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
                                                 mediaPlayer.setLooping(false);
                                                 mediaPlayer.prepare();
@@ -196,7 +198,7 @@ public class AlarmPreferencesActivity extends BaseActivity {
                         alert.show();
                         break;
                     case MULTIPLE_LIST:
-                        alert = new AlertDialog.Builder(AlarmPreferencesActivity.this);
+                        alert = new AlertDialog.Builder(AlarmPreferencesAlarmActivity.this);
                         alert.setTitle(alarmPreference.getTitle());
                         CharSequence[] multiListItems = new CharSequence[alarmPreference.getOptions().length];
                         for (int i = 0; i < multiListItems.length; i++)
@@ -240,7 +242,7 @@ public class AlarmPreferencesActivity extends BaseActivity {
                         alert.show();
                         break;
                     case TIME:
-                        TimePickerDialog timePickerDialog = new TimePickerDialog(AlarmPreferencesActivity.this, new OnTimeSetListener() {
+                        TimePickerDialog timePickerDialog = new TimePickerDialog(AlarmPreferencesAlarmActivity.this, new OnTimeSetListener() {
 
                             @Override
                             public void onTimeSet(TimePicker timePicker, int hours, int minutes) {
@@ -331,15 +333,17 @@ public class AlarmPreferencesActivity extends BaseActivity {
 
         DataBaseAlarmsHandler.init(getApplicationContext());
         if (getMyAlarm().getId() < 1) {
-
             DataBaseAlarmsHandler.create(alarm);
-
         } else {
             DataBaseAlarmsHandler.update(alarm);
             callAlarmScheduleService();
         }
         finish();
+    }
 
+    public void callAlarmScheduleService() {
+        Intent AlarmServiceIntent = new Intent(this, AlarmServiceBroadcastReciever.class);
+        sendBroadcast(AlarmServiceIntent, null);
     }
 
     @Override
@@ -349,9 +353,8 @@ public class AlarmPreferencesActivity extends BaseActivity {
                 if (validateAlarmName(input)) {
                     submitAlarm();
                     finish();
-
                 } else if (!validateAlarmName(input)) {
-                    Toast.makeText(AlarmPreferencesActivity.this, "Add Name of Medicine to Take", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AlarmPreferencesAlarmActivity.this, "Add Name of Medicine to Take", Toast.LENGTH_SHORT).show();
                     return;
                 }
             case R.id.cancel_alarm:

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.code.kawakuti.phonepharmacy.home.Med;
 
@@ -14,33 +13,50 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Cr   eated by Russelius on 26/01/16.
+ * Created by Russelius on 26/01/16.
  */
 public class DataBaseMedsHandler extends SQLiteOpenHelper {
+    static DataBaseMedsHandler instance = null;
+    static SQLiteDatabase database = null;
 
-    private static final int DATABASE_VERSION = 1;
-    protected static final String DATABASE_NAME = "MedsDataBase";
-    // Name of table
-    private static final String TABLE_NAME = "meds";
-
-
-    // All Keys used in table
-    private static final String KEY_ID = "id";
-    private static final String KEY_NAME = "name";
-    private static final String KEY_DESCRIPTION = "description";
-    private static final String KEY_EXPIREDATE = "expiraDate";
-    private static final String KEY_SRCIMG = "srcImage";
-
+    static final String DATABASE_NAME = "MedicineDataBase";
+    static final int DATABASE_VERSION = 1;
+    public static final String MED_TABLE = "medicine";
+    public static final String COLUMN_MED_ID = "id";
+    public static final String COLUMN_MED_NAME = "name";
+    public static final String COLUMN_MED_DESCRIPTION = "description";
+    public static final String COLUMN_MED_EXPIREDATE = "expiraDate";
+    public static final String COLUMN_MED_SRCIMG = "srcImage";
 
     private static final String CREATE_TABLE_MEDS = "CREATE TABLE "
-            + TABLE_NAME + "(" + KEY_ID
+            + MED_TABLE + "(" + COLUMN_MED_ID
             + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + KEY_NAME + " TEXT,"
-            + KEY_DESCRIPTION + " TEXT,"
-            + KEY_EXPIREDATE + " DATE,"
-            + KEY_SRCIMG + " TEXT);";
+            + COLUMN_MED_NAME + " TEXT,"
+            + COLUMN_MED_DESCRIPTION + " TEXT,"
+            + COLUMN_MED_EXPIREDATE + " DATE,"
+            + COLUMN_MED_SRCIMG + " TEXT);";
 
-    private static final String TAG = " DATA BASE ";
+    public static void init(Context context) {
+        if (null == instance) {
+            instance = new DataBaseMedsHandler(context);
+        }
+    }
+
+    public static SQLiteDatabase getDatabase() {
+        if (null == database) {
+            database = instance.getWritableDatabase();
+        }
+        return database;
+    }
+
+    public static void deactivate() {
+        if (null != database && database.isOpen()) {
+            database.close();
+        }
+        database = null;
+        instance = null;
+    }
+
 
     public DataBaseMedsHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -92,13 +108,13 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
 
         // Creating content values
         ContentValues values = new ContentValues();
-        values.put(KEY_NAME, med.getName());
-        values.put(KEY_DESCRIPTION, med.getDescription());
-        values.put(KEY_EXPIREDATE, persistDate(med.getExpireDate()));
-        values.put(KEY_SRCIMG, med.getSrcImage());
+        values.put(COLUMN_MED_NAME, med.getName());
+        values.put(COLUMN_MED_DESCRIPTION, med.getDescription());
+        values.put(COLUMN_MED_EXPIREDATE, persistDate(med.getExpireDate()));
+        values.put(COLUMN_MED_SRCIMG, med.getSrcImage());
 
         // insert row in Meds table
-        long insert = db.insert(TABLE_NAME, null, values);
+        long insert = db.insert(MED_TABLE, null, values);
 
         return insert;
     }
@@ -110,58 +126,71 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
      * @return
      */
     public int updateEntry(Med med) {
-        SQLiteDatabase db = this.getWritableDatabase();
+
 
         // Creating content values
         ContentValues values = new ContentValues();
-        values.put(KEY_NAME, med.getName());
-        values.put(KEY_DESCRIPTION, med.getDescription());
-        values.put(KEY_EXPIREDATE, persistDate(med.getExpireDate()));
-        values.put(KEY_SRCIMG, med.getSrcImage());
+        values.put(COLUMN_MED_NAME, med.getName());
+        values.put(COLUMN_MED_DESCRIPTION, med.getDescription());
+        values.put(COLUMN_MED_EXPIREDATE, persistDate(med.getExpireDate()));
+        values.put(COLUMN_MED_SRCIMG, med.getSrcImage());
 
         // update row in Med table base on med value
-        return db.update(TABLE_NAME, values, KEY_ID + " = ?",
+        return getDatabase().update(MED_TABLE, values, COLUMN_MED_ID + " = ?",
                 new String[]{String.valueOf(med.getId())});
     }
 
+
     /**
-     * Used to delete particular student entry
+     * Used to delete particular Med entry
+     *
+     * @param med
+     */
+    public int deleteEntry(Med med) {
+        return deleteEntry(med.getId());
+    }
+
+
+    /**
+     * Used to delete particular Med entry
      *
      * @param id
      */
-    public void deleteEntry(long id) {
+    public int deleteEntry(long id) {
         // delete row in students table based on id
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_NAME, KEY_ID + " = ?",
+
+        return getDatabase().delete(MED_TABLE, COLUMN_MED_ID + " = ?",
                 new String[]{String.valueOf(id)});
     }
 
+    public static int deleteAll() {
+        return getDatabase().delete(MED_TABLE, "1", null);
+    }
+
     /**
-     * Used to get particular student details
+     * Used to get particular Med details
      *
      * @param id
      * @return
      */
 
     public Med getMed(long id) {
-        SQLiteDatabase db = this.getReadableDatabase();
 
-        String selectQuery = "SELECT  * FROM " + TABLE_NAME + " WHERE "
-                + KEY_ID + " = " + id;
+        String selectQuery = "SELECT * FROM " + MED_TABLE + " WHERE "
+                + COLUMN_MED_ID + " = " + id;
+        Med med = null;
+        Cursor c = getDatabase().rawQuery(selectQuery, null);
 
-        Log.d(TAG, selectQuery);
-
-        Cursor c = db.rawQuery(selectQuery, null);
-
-        if (c != null)
+        if (c != null) {
             c.moveToFirst();
-        Med med = new Med();
-        med.setId(c.getInt(c.getColumnIndex(KEY_ID)));
-        med.setName(c.getString(c.getColumnIndex(KEY_NAME)));
-        med.setDescription(c.getString(c.getColumnIndex(KEY_DESCRIPTION)));
-        med.setExpireDate(loadDate(c, c.getColumnIndex(KEY_EXPIREDATE)));
-        med.setSrcImage(c.getString(c.getColumnIndex(KEY_SRCIMG)));
-
+            med = new Med();
+            med.setId(c.getInt(c.getColumnIndex(COLUMN_MED_ID)));
+            med.setName(c.getString(c.getColumnIndex(COLUMN_MED_NAME)));
+            med.setDescription(c.getString(c.getColumnIndex(COLUMN_MED_DESCRIPTION)));
+            med.setExpireDate(loadDate(c, c.getColumnIndex(COLUMN_MED_EXPIREDATE)));
+            med.setSrcImage(c.getString(c.getColumnIndex(COLUMN_MED_SRCIMG)));
+        }
+        c.close();
         return med;
     }
 
@@ -173,8 +202,7 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
      */
     public List<Med> getAllMedsList() {
         List<Med> medsArrayList = new ArrayList<Med>();
-        String selectQuery = "SELECT  * FROM " + TABLE_NAME;
-        Log.d(TAG, selectQuery);
+        String selectQuery = "SELECT  * FROM " + MED_TABLE;
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
@@ -183,16 +211,31 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 Med med = new Med();
-                med.setId(c.getInt(c.getColumnIndex(KEY_ID)));
-                med.setName(c.getString(c.getColumnIndex(KEY_NAME)));
-                med.setDescription(c.getString(c.getColumnIndex(KEY_DESCRIPTION)));
-                med.setExpireDate(loadDate(c, c.getColumnIndex(KEY_EXPIREDATE)));
-                med.setSrcImage(c.getString(c.getColumnIndex(KEY_SRCIMG)));
+                med.setId(c.getInt(c.getColumnIndex(COLUMN_MED_ID)));
+                med.setName(c.getString(c.getColumnIndex(COLUMN_MED_NAME)));
+                med.setDescription(c.getString(c.getColumnIndex(COLUMN_MED_DESCRIPTION)));
+                med.setExpireDate(loadDate(c, c.getColumnIndex(COLUMN_MED_EXPIREDATE)));
+                med.setSrcImage(c.getString(c.getColumnIndex(COLUMN_MED_SRCIMG)));
                 // adding to meds list
                 medsArrayList.add(med);
             } while (c.moveToNext());
         }
         return medsArrayList;
     }
+
+    public static Cursor getCursor() {
+        // TODO Auto-generated method stub
+        String[] columns = new String[]{
+                COLUMN_MED_ID,
+                COLUMN_MED_NAME,
+                COLUMN_MED_DESCRIPTION,
+                COLUMN_MED_EXPIREDATE,
+                COLUMN_MED_SRCIMG,
+        };
+        return getDatabase().query(MED_TABLE, columns, null, null, null, null,
+                null);
+    }
+
+
 }
 

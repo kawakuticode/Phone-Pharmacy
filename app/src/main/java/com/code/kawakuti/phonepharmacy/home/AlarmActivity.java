@@ -10,6 +10,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,7 +25,7 @@ import android.widget.Toast;
 
 import com.code.kawakuti.phonepharmacy.R;
 import com.code.kawakuti.phonepharmacy.database.DataBaseAlarmsHandler;
-import com.code.kawakuti.phonepharmacy.preferences.AlarmPreferencesActivity;
+import com.code.kawakuti.phonepharmacy.preferences.AlarmPreferencesAlarmActivity;
 import com.code.kawakuti.phonepharmacy.service.AlarmServiceBroadcastReciever;
 
 import java.util.List;
@@ -38,6 +41,7 @@ public class AlarmActivity extends Fragment implements View.OnClickListener{
 		rootView = inflater.inflate(R.layout.alarm_activity, container, false);
 		mathAlarmListView = (ListView)rootView.findViewById(android.R.id.list);
 		mathAlarmListView.setLongClickable(true);
+		setHasOptionsMenu(true);
 		mathAlarmListView.setOnItemLongClickListener(new OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -80,7 +84,7 @@ public class AlarmActivity extends Fragment implements View.OnClickListener{
 			public void onItemClick(AdapterView<?> arg0, View v, int position, long id) {
 				v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 				Alarm alarm = (Alarm) alarmListAdapter.getItem(position);
-				Intent intent = new Intent(getContext(), AlarmPreferencesActivity.class);
+				Intent intent = new Intent(getContext(), AlarmPreferencesAlarmActivity.class);
 				intent.putExtra("alarm", alarm);
 				startActivity(intent);
 			}
@@ -92,7 +96,7 @@ public class AlarmActivity extends Fragment implements View.OnClickListener{
 			public void onClick(View view) {
 
 				Toast.makeText(getContext(), "add alarm to take medicine", Toast.LENGTH_SHORT).show();
-				Intent intent = new Intent(getContext(), AlarmPreferencesActivity.class);
+				Intent intent = new Intent(getContext(), AlarmPreferencesAlarmActivity.class);
 					startActivity(intent);
 
 			}
@@ -150,6 +154,31 @@ public class AlarmActivity extends Fragment implements View.OnClickListener{
 	protected void callMathAlarmScheduleService() {
 		Intent mathAlarmServiceIntent = new Intent(getContext(), AlarmServiceBroadcastReciever.class);
 		getContext().sendBroadcast(mathAlarmServiceIntent, null);
+	}
+
+
+
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.export_import_menu, menu);
+	}
+
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.menu_item_export:
+
+
+
+				break;
+			case R.id.menu_item_import :
+
+				break;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 }

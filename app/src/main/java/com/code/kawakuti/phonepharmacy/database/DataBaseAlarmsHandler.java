@@ -18,11 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Created by Russelius on 26/01/16.
+ */
 public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 	static DataBaseAlarmsHandler instance = null;
 	static SQLiteDatabase database = null;
 	
-	static final String DATABASE_NAME = "DB";
+	static final String DATABASE_NAME = "AlarmsDataBase";
 	static final int DATABASE_VERSION = 1;
 	
 	public static final String ALARM_TABLE = "alarm";

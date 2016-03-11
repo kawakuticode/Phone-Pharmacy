@@ -2,13 +2,16 @@ package com.code.kawakuti.phonepharmacy.location;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.code.kawakuti.phonepharmacy.R;
@@ -24,17 +27,13 @@ import java.util.ArrayList;
 /**
  * Created by Russelius on 01/02/16.
  */
-public class FindPlaces extends AppCompatActivity implements LocationListener {
+public class FindPlaces extends ActionBarActivity implements LocationListener {
 
-
-    private final String TAG = getClass().getSimpleName();
     private GoogleMap mMap;
     private String type_of_place;
-    private GpsTracker gpsTracker;
-    private LocationManager locationManager;
     private Location location;
-    private Context mContext;
-    private boolean isGPSEnabled, isNetworkEnabled;
+    private float zoom_value;
+    private int radius;
 
 
     @Override
@@ -42,28 +41,16 @@ public class FindPlaces extends AppCompatActivity implements LocationListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.findplaces);
         initCompo(savedInstanceState);
-        gpsTracker = new GpsTracker(this);
 
+        radius = 1000;
+        zoom_value = 14;
 
-
-        isGPSEnabled = gpsTracker.myLocationManager().isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-        isNetworkEnabled = gpsTracker.myLocationManager().isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        if (isGPSEnabled && isNetworkEnabled) {
-            initMap();
-            new GetPlaces(FindPlaces.this,
-                    type_of_place).execute();
-
-        } else {
-
-            gpsTracker.turnGPSWifi();
-            gpsTracker.showGpsSettingsAlert();
-            return;
-        }
-
+        initMap();
+        new SyncGetPlaces(FindPlaces.this,
+                type_of_place).execute();
 
     }
+
 
     public void initMap() {
         try {
@@ -83,19 +70,37 @@ public class FindPlaces extends AppCompatActivity implements LocationListener {
             Bundle extras = getIntent().getExtras();
             if (extras != null) {
                 type_of_place = extras.getString("TYPE_OF_PLACE");
-
-            } else {
-                type_of_place = null;
+                radius = extras.getInt("radius");
+                location = extras.getParcelable("location");
             }
         } else {
             type_of_place = (String) savedInstanceState.getSerializable(("TYPE_OF_PLACE"));
-
+            radius = savedInstanceState.getInt("radius");
+            location = savedInstanceState.getParcelable("location");
         }
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("TYPE_OF_PLACE", type_of_place);
+        outState.putParcelable("location", location);
+        outState.putInt("radius" , radius);
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        type_of_place = savedInstanceState.getString("TYPE_OF_PLACE");
+        location = savedInstanceState.getParcelable("location");
+        radius = savedInstanceState.getInt("radius");
     }
 
     @Override
     public void onLocationChanged(Location location) {
-
+        location.set(location);
     }
 
     @Override
@@ -113,31 +118,59 @@ public class FindPlaces extends AppCompatActivity implements LocationListener {
 
     }
 
-    private class GetPlaces extends AsyncTask<ArrayList<Place>, Integer, ArrayList<Place>> {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_distances, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String url = null;
+        Intent intent = null;
+        switch (item.getItemId()) {
+            case R.id.menu_1km:
+                radius = 1000;
+                zoom_value = 14;
+                new SyncGetPlaces(FindPlaces.this,
+                    type_of_place).execute();
+                break;
+            case R.id.menu_2km:
+                radius = 2000;
+                zoom_value = 13;
+                new SyncGetPlaces(FindPlaces.this,
+                        type_of_place).execute();
+                break;
+            case R.id.menu_3km:
+                radius = 3000;
+                zoom_value = 12;
+                new SyncGetPlaces(FindPlaces.this,
+                        type_of_place).execute();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private class SyncGetPlaces extends AsyncTask<ArrayList<Place>, Integer, ArrayList<Place>> {
         private ProgressDialog dialog;
         private Context context;
         private String type_of_place;
         ArrayList<Place> findPlaces = new ArrayList<>();
 
-        public GetPlaces(Context c, String type) {
+        public SyncGetPlaces(Context c, String type) {
             this.context = c;
             this.type_of_place = type;
         }
 
         @Override
         protected ArrayList<Place> doInBackground(ArrayList<Place>... params) {
-            PlacesService service = new PlacesService("AIzaSyA-iEtJ1Mqofg3n9WyjxeLTCAZ_68wR06Y");
+            PlacesLocator placesLocator = new PlacesLocator("AIzaSyA-iEtJ1Mqofg3n9WyjxeLTCAZ_68wR06Y");
 
-
-            if (gpsTracker.canGetLocation()) {
-                location = gpsTracker.getLocation();
-                Log.d(TAG, location.toString());
-                if (location != null) {
-                    findPlaces = service.findPlaces(
-                            gpsTracker.getLatitude(), gpsTracker.getLongitude(), type_of_place);
-                }
+            if (location != null) {
+                findPlaces = placesLocator.getPlacesArround(location.getLatitude(), location.getLongitude(), type_of_place, radius);
             }
-
             return findPlaces;
         }
 
@@ -160,20 +193,17 @@ public class FindPlaces extends AppCompatActivity implements LocationListener {
             }
             mMap.clear();
             if (places.size() != 0) {
-
                 mMap.addMarker(new MarkerOptions()
                         .title(" I am Here!! ")
                         .position(
-                                new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()))).setAlpha(5);
+                                new LatLng(location.getLatitude(), location.getLongitude()))).setAlpha(5);
                 for (int i = 0; i < places.size(); i++) {
-
-
                     mMap.addMarker(new MarkerOptions()
                             .title(places.get(i).getName())
                             .position(
                                     new LatLng(places.get(i).getLatitude(), places
                                             .get(i).getLongitude())));
-                    Log.e(TAG, "places-->  : " + places.get(i).getName());
+                    Log.e("FIND", "places-->  : " + places.get(i).getName());
 
                 }
                 CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -181,7 +211,7 @@ public class FindPlaces extends AppCompatActivity implements LocationListener {
                                 .get(0).getLongitude()))
                                 // Sets the center of the map to
                                 // Mountain View
-                        .zoom(14) // Sets the zoom
+                        .zoom(zoom_value) // Sets the zoom
                         .tilt(30) // Sets the tilt of the camera to 30 degrees
                         .build(); // Creates a CameraPosition from the builder
                 mMap.animateCamera(CameraUpdateFactory

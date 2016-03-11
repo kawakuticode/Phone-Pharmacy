@@ -17,32 +17,27 @@ import java.util.logging.Logger;
 /**
  * Created by Russelius on 01/02/16.
  */
-public class PlacesService {
-    private String API_KEY;
+public class PlacesLocator {
 
-    public PlacesService(String apikey) {
+    private String API_KEY;
+    public PlacesLocator(String apikey) {
         this.API_KEY = apikey;
     }
-
     public void setApiKey(String apikey) {
         this.API_KEY = apikey;
     }
+    public ArrayList<Place> getPlacesArround(double latitude, double longitude,
+                                             String placeSpecification , int radius) {
 
-    public ArrayList<Place> findPlaces(double latitude, double longitude,
-                                        String placeSpecification) {
-
-        String urlString = makeUrl(latitude, longitude, placeSpecification);
+        String urlString = makeUrl(latitude, longitude, placeSpecification, radius);
         ArrayList<Place> arrayList = new ArrayList<>();
 
         try {
 
             String json = getJSON(urlString);
-
             System.out.println("my Query" + urlString);
-
             JSONObject object = new JSONObject(json);
             JSONArray array = object.getJSONArray("results");
-
 
             for (int i = 0; i < array.length(); i++) {
                 try {
@@ -55,7 +50,7 @@ public class PlacesService {
             }
 
         } catch (JSONException ex) {
-            Logger.getLogger(PlacesService.class.getName()).log(Level.SEVERE,
+            Logger.getLogger(PlacesLocator.class.getName()).log(Level.SEVERE,
                     null, ex);
         }
         Log.d("ARRAYSIZE", urlString.toString()+"") ;
@@ -64,7 +59,7 @@ public class PlacesService {
     }
 
     // https://maps.googleapis.com/maps/api/place/search/json?location=28.632808,77.218276&radius=500&types=atm&sensor=false&key=apikey
-    private String makeUrl(double latitude, double longitude, String place) {
+    private String makeUrl(double latitude, double longitude, String place , int radius) {
         StringBuilder urlString = new StringBuilder(
                 "https://maps.googleapis.com/maps/api/place/search/json?");
 
@@ -73,7 +68,7 @@ public class PlacesService {
             urlString.append(Double.toString(latitude));
             urlString.append(",");
             urlString.append(Double.toString(longitude));
-            urlString.append("&radius=1000");
+            urlString.append("&radius="+radius);
             urlString.append("&type="+place);
             urlString.append("&sensor=false&key=" + API_KEY);
         } else {
@@ -81,7 +76,7 @@ public class PlacesService {
             urlString.append(Double.toString(latitude));
             urlString.append(",");
             urlString.append(Double.toString(longitude));
-            urlString.append("&radius=1000");
+            urlString.append("&radius="+radius);
             urlString.append("&type=" + place);
             urlString.append("&sensor=false&key=" + API_KEY);
         }

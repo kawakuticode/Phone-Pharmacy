@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_1km"
+        android:title="@string/menu_item_1km">
+    </item>
+    <item
+        android:id="@+id/menu_2km"
+        android:title="@string/menu_item_2km"></item>
+    <item
+        android:id="@+id/menu_3km"
+        android:title="@string/menu_item_3km"></item>
+</menu>
