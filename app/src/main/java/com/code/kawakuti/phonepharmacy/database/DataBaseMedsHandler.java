@@ -25,7 +25,7 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
     public static final String COLUMN_MED_ID = "id";
     public static final String COLUMN_MED_NAME = "name";
     public static final String COLUMN_MED_DESCRIPTION = "description";
-    public static final String COLUMN_MED_EXPIREDATE = "expiraDate";
+    public static final String COLUMN_MED_EXPIREDATE = "expirationDate";
     public static final String COLUMN_MED_SRCIMG = "srcImage";
 
     private static final String CREATE_TABLE_MEDS = "CREATE TABLE "

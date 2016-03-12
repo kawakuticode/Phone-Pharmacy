@@ -128,9 +128,10 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
 
             if (db.addMed(tmp) > 0) {
                 Toast.makeText(this, "Inserted with Sucess", Toast.LENGTH_SHORT).show();
+                db.close();
             }
         }
-        Toast.makeText(getApplicationContext(), "Thank You!", Toast.LENGTH_SHORT).show();
+
     }
 
     private void imageOptions() {
@@ -223,6 +224,9 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        // save file url in bundle as it will be null on scren orientation
+        // changes
         outState.putParcelable("file_uri", fileUri);
         outState.putSerializable("calendar_state", mCalendar);
     }

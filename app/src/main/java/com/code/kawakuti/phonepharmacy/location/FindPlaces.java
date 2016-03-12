@@ -167,7 +167,6 @@ public class FindPlaces extends ActionBarActivity implements LocationListener {
         @Override
         protected ArrayList<Place> doInBackground(ArrayList<Place>... params) {
             PlacesLocator placesLocator = new PlacesLocator("AIzaSyA-iEtJ1Mqofg3n9WyjxeLTCAZ_68wR06Y");
-
             if (location != null) {
                 findPlaces = placesLocator.getPlacesArround(location.getLatitude(), location.getLongitude(), type_of_place, radius);
             }

@@ -2,13 +2,16 @@ package com.code.kawakuti.phonepharmacy.home;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -27,11 +30,14 @@ import com.code.kawakuti.phonepharmacy.R;
 import com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
 /**
@@ -40,13 +46,33 @@ import au.com.bytecode.opencsv.CSVWriter;
 public class MedicinesFragment extends Fragment {
 
     private static final String TAG = "PHARMACY";
+
+
+    private static final int SELECT_FILE = 1;
     private ListView medicineListView;
     private MedicineAdapter medicineAdapter;
     private List<Med> listMeds = new ArrayList<Med>();
     private DataBaseMedsHandler db;
     private ImageLoader loaderImg;
+    private String import_file_path;
     private String options[] = new String[]{"Update", "Delete", "Cancel"};
     View rootView;
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable("file_uri", import_file_path);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+            import_file_path = (String) savedInstanceState.get("file_uri");
+        }
+    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.medicinefragment, container, false);
@@ -102,6 +128,7 @@ public class MedicinesFragment extends Fragment {
 
             }
         });
+        db.close();
         return rootView;
     }
 
@@ -122,13 +149,15 @@ public class MedicinesFragment extends Fragment {
     public void deleteMed(Med med) {
         DataBaseMedsHandler.init(getContext());
         db.deleteEntry(med);
+        db.close();
         updateListMeds();
     }
 
     public void updateListMeds() {
-        db = new DataBaseMedsHandler(this.getContext());
+        DataBaseMedsHandler.init(getContext());
         final List<Med> medicines = db.getAllMedsList();
         medicineAdapter.setMedicines(medicines);
+        db.close();
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 MedicinesFragment.this.medicineAdapter.notifyDataSetInvalidated();
@@ -196,14 +225,86 @@ public class MedicinesFragment extends Fragment {
                 break;
             case R.id.menu_item_import:
 
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(
+                        Intent.createChooser(intent, "Select File"),
+                        SELECT_FILE);
+
+
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-    public class ImportCSVToDataBaseTask extends AsyncTask<String, Void, Boolean> {
+        switch (requestCode) {
+            case SELECT_FILE:
+                if (resultCode == getActivity().RESULT_OK) {
+                    // Get the Uri of the selected file
+                    //
+                    import_file_path = data.getData().getPath();
+                    new ImportCSVToDataBaseTask(data.getData()).execute();
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public class ImportCSVToDataBaseTask extends AsyncTask<String, Void, Long> {
         private final ProgressDialog dialog = new ProgressDialog(getContext());
+        private Uri file_path;
+        Long result;
+
+        public ImportCSVToDataBaseTask(Uri path) {
+            this.file_path = path;
+        }
+
+        @Override
+        protected Long doInBackground(String... params) {
+
+            ParcelFileDescriptor pFileDescriptor = null;
+            DataBaseMedsHandler.init(getContext());
+            db.getWritableDatabase().beginTransaction();
+            try {
+                pFileDescriptor = getContext().getContentResolver().openFileDescriptor(file_path, "r");
+                FileDescriptor fileDescriptor = pFileDescriptor.getFileDescriptor();
+
+
+                CSVReader reader = new CSVReader(new FileReader(fileDescriptor));
+                String[] nextLine;
+                //here I am just displaying the CSV file contents, and you can store your file content into db from while loop...
+
+                while ((nextLine = reader.readNext()) != null) {
+                    if (nextLine.length != 5) {
+                        Log.d("CSVParser", "Skipping Bad CSV Row");
+                        continue;
+                    }
+                    ContentValues cv = new ContentValues();
+                   // cv.put("id", nextLine[0].trim());
+                    cv.put("name", nextLine[1].trim());
+                    cv.put("description", nextLine[2].trim());
+                    cv.put("expirationDate", nextLine[3].trim());
+                    cv.put("srcImage", nextLine[4].trim());
+                    Log.d("INSERTION --> ", db.getWritableDatabase().insert("medicine", null, cv) + " <---");
+
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
+            db.getWritableDatabase().setTransactionSuccessful();
+            db.getWritableDatabase().endTransaction();
+            db.close();
+
+            return Long.valueOf(-1);
+
+        }
+
 
         @Override
         protected void onPreExecute() {
@@ -213,57 +314,50 @@ public class MedicinesFragment extends Fragment {
             this.dialog.show();
         }
 
-        protected Boolean doInBackground(final String... args) {
-            String state = Environment.getExternalStorageState();
-            if (!Environment.MEDIA_MOUNTED.equals(state)) {
-                return false;
+        @Override
+        protected void onPostExecute(Long check) {
+            super.onPostExecute(check);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
             }
-            else {
-                File exportDir = new File(Environment.getExternalStorageDirectory(), "/PhoneParmacy/");
 
-                if (!exportDir.exists()) {
-                    exportDir.mkdirs();
-                }
+            if (Long.valueOf(check) > 0) {
+                updateListMeds();
+                Toast.makeText(getContext(), "File is built Successfully!" + "\n", Toast.LENGTH_LONG).show();
 
 
-                try {
-                    File file = new File(exportDir, "databaseBackUp.csv");
-
-                    CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
-                    db = new DataBaseMedsHandler(getContext());
-
-                    //+ tablename
-
-                    Cursor curCSV = db.getReadableDatabase().rawQuery("select * from medicine", null);
-                    csvWrite.writeNext(curCSV.getColumnNames());
-                    while (curCSV.moveToNext()) {
-                        String arrStr[] = null;
-                        String[] mySecondStringArray = new String[curCSV.getColumnNames().length];
-                        for (int i = 0; i < curCSV.getColumnNames().length; i++) {
-                            mySecondStringArray[i] = curCSV.getString(i);
-                        }
-                        csvWrite.writeNext(mySecondStringArray);
-                    }
-                    csvWrite.close();
-                    curCSV.close();
-                    return true;
-
-                } catch (IOException e) {
-                    Log.e("EXPORT", e.getMessage(), e);
-                    return false;
-                }
-            }
-        }
-
-        protected void onPostExecute(final Boolean success) {
-            this.dialog.dismiss();
-            if (success) {
-                Toast.makeText(getContext(), "Export successful!", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getContext(), "Export failed", Toast.LENGTH_SHORT).show();
+                updateListMeds();
+                Toast.makeText(getContext(), "File fail to build", Toast.LENGTH_SHORT).show();
             }
         }
     }
+
+
+       /* @Override
+        protected String doInBackground(String... params) {
+
+            String data = "";
+            Log.d(getClass().getName(), file.toString());
+
+            try {
+                CSVReader reader = new CSVReader(new FileReader(file));
+                String[] nextLine;
+                //here I am just displaying the CSV file contents, and you can store your file content into db from while loop...
+                while ((nextLine = reader.readNext()) != null) {
+                    // nextLine[] is an array of values from the line
+                    String accId = nextLine[0];
+                    String acc_name = nextLine[1];
+                    data = data + "AccId:" + accId + "  Account_name:" + acc_name + "\n";
+                }
+                return data;
+
+            } catch (Exception e) {
+                Log.e("Error", "Error for importing file");
+            }
+            return data = "";
+
+        }*/
 
 
     public class ExportDatabaseCSVTask extends AsyncTask<String, Void, Boolean> {
@@ -281,8 +375,7 @@ public class MedicinesFragment extends Fragment {
             String state = Environment.getExternalStorageState();
             if (!Environment.MEDIA_MOUNTED.equals(state)) {
                 return false;
-            }
-            else {
+            } else {
                 File exportDir = new File(Environment.getExternalStorageDirectory(), "/PhoneParmacy/");
 
                 if (!exportDir.exists()) {

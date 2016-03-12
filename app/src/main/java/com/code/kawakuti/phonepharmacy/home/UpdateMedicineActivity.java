@@ -128,6 +128,7 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
             getMed().setExpireDate(mCalendar.getTime());
             getMed().setSrcImage(img_source);
             db.updateEntry(getMed());
+            db.close();
             Toast.makeText(this, "Updated with Sucess", Toast.LENGTH_SHORT).show();
         }
     }
