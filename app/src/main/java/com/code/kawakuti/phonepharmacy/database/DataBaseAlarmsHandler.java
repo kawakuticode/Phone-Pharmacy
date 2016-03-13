@@ -22,7 +22,9 @@ import java.util.List;
  * Created by Russelius on 26/01/16.
  */
 public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
+
 	static DataBaseAlarmsHandler instance = null;
+
 	static SQLiteDatabase database = null;
 	
 	static final String DATABASE_NAME = "AlarmsDataBase";
@@ -176,7 +178,7 @@ public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 				null);
 	}
 
-	DataBaseAlarmsHandler(Context context) {
+	 DataBaseAlarmsHandler(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 

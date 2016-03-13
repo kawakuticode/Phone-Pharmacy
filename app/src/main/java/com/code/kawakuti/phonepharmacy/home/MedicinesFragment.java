@@ -6,11 +6,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -28,17 +26,17 @@ import android.widget.Toast;
 
 import com.code.kawakuti.phonepharmacy.R;
 import com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler;
+import com.code.kawakuti.phonepharmacy.database.ExportDataBaseToFile;
 
-import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
+
+import static com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler.MedColumns.TABLE_NAME;
 
 /**
  * Created by Russelius on 31/01/16.
@@ -57,6 +55,7 @@ public class MedicinesFragment extends Fragment {
     private String import_file_path;
     private String options[] = new String[]{"Update", "Delete", "Cancel"};
     View rootView;
+    private String file_name = "medicine_data_base_back_up.csv";
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -76,13 +75,11 @@ public class MedicinesFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.medicinefragment, container, false);
-
         setHasOptionsMenu(true);
-        db = new DataBaseMedsHandler(this.getContext());
+        db = new DataBaseMedsHandler(getContext());
         medicineListView = (ListView) rootView.findViewById(R.id.list);
         loaderImg = new ImageLoader(this.getContext());
-        listMeds = db.getAllMedsList();
-
+        listMeds = db.getAllMedsList() ;
         medicineAdapter = new MedicineAdapter(this.getContext(), listMeds, loaderImg);
         medicineListView.setAdapter(medicineAdapter);
         registerForContextMenu(medicineListView);
@@ -193,16 +190,12 @@ public class MedicinesFragment extends Fragment {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
             case R.id.update:
                 return true;
-
             case R.id.delete:
                 return true;
-
             case R.id.cancel_update:
                 return true;
-
             default:
                 return super.onContextItemSelected(item);
         }
@@ -212,7 +205,6 @@ public class MedicinesFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.export_import_menu, menu);
-
     }
 
 
@@ -220,19 +212,16 @@ public class MedicinesFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_export:
-
-                new ExportDatabaseCSVTask().execute();
+                DataBaseMedsHandler.init(getContext());
+                new ExportDataBaseToFile(getContext(), db, file_name, TABLE_NAME).execute();
                 break;
             case R.id.menu_item_import:
-
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("*/*");
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 startActivityForResult(
                         Intent.createChooser(intent, "Select File"),
                         SELECT_FILE);
-
-
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -246,7 +235,6 @@ public class MedicinesFragment extends Fragment {
             case SELECT_FILE:
                 if (resultCode == getActivity().RESULT_OK) {
                     // Get the Uri of the selected file
-                    //
                     import_file_path = data.getData().getPath();
                     new ImportCSVToDataBaseTask(data.getData()).execute();
                 }
@@ -266,7 +254,6 @@ public class MedicinesFragment extends Fragment {
 
         @Override
         protected Long doInBackground(String... params) {
-
             ParcelFileDescriptor pFileDescriptor = null;
             DataBaseMedsHandler.init(getContext());
             db.getWritableDatabase().beginTransaction();
@@ -285,13 +272,12 @@ public class MedicinesFragment extends Fragment {
                         continue;
                     }
                     ContentValues cv = new ContentValues();
-                   // cv.put("id", nextLine[0].trim());
+                    // cv.put("id", nextLine[0].trim());
                     cv.put("name", nextLine[1].trim());
                     cv.put("description", nextLine[2].trim());
                     cv.put("expirationDate", nextLine[3].trim());
                     cv.put("srcImage", nextLine[4].trim());
                     Log.d("INSERTION --> ", db.getWritableDatabase().insert("medicine", null, cv) + " <---");
-
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -300,7 +286,6 @@ public class MedicinesFragment extends Fragment {
             db.getWritableDatabase().setTransactionSuccessful();
             db.getWritableDatabase().endTransaction();
             db.close();
-
             return Long.valueOf(-1);
 
         }
@@ -320,107 +305,13 @@ public class MedicinesFragment extends Fragment {
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
-
             if (Long.valueOf(check) > 0) {
                 updateListMeds();
                 Toast.makeText(getContext(), "File is built Successfully!" + "\n", Toast.LENGTH_LONG).show();
-
-
             } else {
                 updateListMeds();
                 Toast.makeText(getContext(), "File fail to build", Toast.LENGTH_SHORT).show();
             }
         }
     }
-
-
-       /* @Override
-        protected String doInBackground(String... params) {
-
-            String data = "";
-            Log.d(getClass().getName(), file.toString());
-
-            try {
-                CSVReader reader = new CSVReader(new FileReader(file));
-                String[] nextLine;
-                //here I am just displaying the CSV file contents, and you can store your file content into db from while loop...
-                while ((nextLine = reader.readNext()) != null) {
-                    // nextLine[] is an array of values from the line
-                    String accId = nextLine[0];
-                    String acc_name = nextLine[1];
-                    data = data + "AccId:" + accId + "  Account_name:" + acc_name + "\n";
-                }
-                return data;
-
-            } catch (Exception e) {
-                Log.e("Error", "Error for importing file");
-            }
-            return data = "";
-
-        }*/
-
-
-    public class ExportDatabaseCSVTask extends AsyncTask<String, Void, Boolean> {
-        private final ProgressDialog dialog = new ProgressDialog(getContext());
-
-        @Override
-        protected void onPreExecute() {
-            this.dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            this.dialog.setMessage("Please wait while exporting database...");
-            this.dialog.setCancelable(false);
-            this.dialog.show();
-        }
-
-        protected Boolean doInBackground(final String... args) {
-            String state = Environment.getExternalStorageState();
-            if (!Environment.MEDIA_MOUNTED.equals(state)) {
-                return false;
-            } else {
-                File exportDir = new File(Environment.getExternalStorageDirectory(), "/PhoneParmacy/");
-
-                if (!exportDir.exists()) {
-                    exportDir.mkdirs();
-                }
-
-
-                try {
-                    File file = new File(exportDir, "databaseBackUp.csv");
-                    file.createNewFile();
-                    CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
-                    db = new DataBaseMedsHandler(getContext());
-
-                    //+ tablename
-
-                    Cursor curCSV = db.getReadableDatabase().rawQuery("select * from medicine", null);
-                    csvWrite.writeNext(curCSV.getColumnNames());
-                    while (curCSV.moveToNext()) {
-                        String arrStr[] = null;
-                        String[] mySecondStringArray = new String[curCSV.getColumnNames().length];
-                        for (int i = 0; i < curCSV.getColumnNames().length; i++) {
-                            mySecondStringArray[i] = curCSV.getString(i);
-                        }
-                        csvWrite.writeNext(mySecondStringArray);
-                    }
-                    csvWrite.close();
-                    curCSV.close();
-                    return true;
-
-                } catch (IOException e) {
-                    Log.e("EXPORT", e.getMessage(), e);
-                    return false;
-                }
-            }
-        }
-
-        protected void onPostExecute(final Boolean success) {
-            this.dialog.dismiss();
-            if (success) {
-                Toast.makeText(getContext(), "Export successful!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Export failed", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-
 }

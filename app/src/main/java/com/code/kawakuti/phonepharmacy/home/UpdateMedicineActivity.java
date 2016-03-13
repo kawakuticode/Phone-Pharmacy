@@ -58,7 +58,10 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_medicine);
+        DataBaseMedsHandler.init(this.getBaseContext());
         db = new DataBaseMedsHandler(this.getBaseContext());
+
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey("medicine")) {
             setMed((Med) bundle.getSerializable("medicine"));
@@ -66,6 +69,8 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
 
         initCalendar();
         initFields();
+
+
     }
 
     public void initCalendar() {
@@ -89,6 +94,7 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
         updt_desc.addTextChangedListener(new MyTextWatcher(updt_desc));
         updt_slt_photo = (Button) findViewById(R.id.update_btn_add_photo);
         updt_slt_photo.setText(changeButtonTextToPath(getMed().getSrcImage()));
+        img_source = getMed().getSrcImage();
         updt_slt_photo.setOnClickListener(this);
         updt_save = (Button) findViewById(R.id.save_upate);
         updt_save.setOnClickListener(this);
@@ -126,7 +132,8 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
             getMed().setName(updt_name.getText().toString());
             getMed().setDescription(updt_desc.getText().toString());
             getMed().setExpireDate(mCalendar.getTime());
-            getMed().setSrcImage(img_source);
+            getMed().setSrcImage(img_source.toString());
+
             db.updateEntry(getMed());
             db.close();
             Toast.makeText(this, "Updated with Sucess", Toast.LENGTH_SHORT).show();
@@ -164,7 +171,6 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == Activity.RESULT_OK) {
-
             if (requestCode == SELECT_FILE) {
                 onSelectFromGallery(data);
             } else if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
@@ -192,7 +198,6 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
     }
 
     private void onSelectFromGallery(Intent data) {
-
         Uri selectedImageUri = data.getData();
         String[] projection = {MediaStore.MediaColumns.DATA};
         Cursor cursor = this.getContentResolver().query(selectedImageUri, projection, null, null,
@@ -208,10 +213,10 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
 
     private String changeButtonTextToPath(String path) {
         String result = "";
-        if (path != null) {
+        if (path != null ) {
             String[] path_parts = path.split("/");
             result = path_parts[path_parts.length - 1];
-        } else if (path == null) {
+        } else {
             result = "select photo";
         }
         return result;
@@ -290,16 +295,15 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
 
         switch (v.getId()) {
             case R.id.update_btn_add_photo:
-
                 imageOptions();
-
                 break;
             case R.id.save_upate:
                 submitForm();
                 finish();
                 break;
 
-            case R.id.cancel:
+            case R.id.cancel_update:
+                db.close();
                 finish();
                 break;
 

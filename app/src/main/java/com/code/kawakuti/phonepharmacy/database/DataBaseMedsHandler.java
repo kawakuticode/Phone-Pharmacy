@@ -16,17 +16,51 @@ import java.util.List;
  * Created by Russelius on 26/01/16.
  */
 public class DataBaseMedsHandler extends SQLiteOpenHelper {
+
     static DataBaseMedsHandler instance = null;
     static SQLiteDatabase database = null;
 
     static final String DATABASE_NAME = "MedicineDataBase";
     static final int DATABASE_VERSION = 1;
+
+
+
     public static final String MED_TABLE = "medicine";
     public static final String COLUMN_MED_ID = "id";
     public static final String COLUMN_MED_NAME = "name";
     public static final String COLUMN_MED_DESCRIPTION = "description";
     public static final String COLUMN_MED_EXPIREDATE = "expirationDate";
     public static final String COLUMN_MED_SRCIMG = "srcImage";
+
+    public enum MedColumns {
+        TABLE_NAME,
+        MED_ID,
+        MED_NAME,
+        MED_DESC,
+        MED_EXPDATE,
+        MED_SRCIMG;
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case TABLE_NAME:
+                    return "medicine";
+                case MED_ID:
+                    return "id";
+                case MED_NAME:
+                    return "name";
+                case MED_DESC:
+                    return "description";
+                case MED_EXPDATE:
+                    return "expirationDate";
+                case MED_SRCIMG:
+                    return "srcImage";
+
+            }
+            return super.toString();
+        }
+
+    }
 
     private static final String CREATE_TABLE_MEDS = "CREATE TABLE "
             + MED_TABLE + "(" + COLUMN_MED_ID

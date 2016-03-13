@@ -48,7 +48,6 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
     private TextInputLayout inputLayoutMed, inputLayoutDesc;
 
 
-
     private Uri fileUri; // file url to store image/video
 
     private Button btn_selectPhoto, btn_save, btn_cancel;
@@ -63,7 +62,7 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_medicine_);
-        db = new DataBaseMedsHandler(this.getBaseContext());
+        DataBaseMedsHandler.init(this.getBaseContext());
         initCalendar();
         initFields();
 
@@ -125,7 +124,7 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
             tmp.setDescription(medicine_descr.getText().toString());
             tmp.setExpireDate(mCalendar.getTime());
             tmp.setSrcImage(img_source);
-
+            db = new DataBaseMedsHandler(getBaseContext());
             if (db.addMed(tmp) > 0) {
                 Toast.makeText(this, "Inserted with Sucess", Toast.LENGTH_SHORT).show();
                 db.close();
@@ -208,10 +207,10 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
 
     private String changeButtonTextToPath(String path) {
         String result = "";
-        if (path != null) {
+        if (path.length() != 0) {
             String[] path_parts = path.split("/");
             result = path_parts[path_parts.length - 1];
-        } else if (path == null) {
+        } else {
             result = "select photo";
         }
         return result;
