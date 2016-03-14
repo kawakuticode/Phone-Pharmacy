@@ -22,9 +22,6 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
 
     static final String DATABASE_NAME = "MedicineDataBase";
     static final int DATABASE_VERSION = 1;
-
-
-
     public static final String MED_TABLE = "medicine";
     public static final String COLUMN_MED_ID = "id";
     public static final String COLUMN_MED_NAME = "name";
@@ -33,7 +30,7 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
     public static final String COLUMN_MED_SRCIMG = "srcImage";
 
     public enum MedColumns {
-        TABLE_NAME,
+        TABLE_MEDICINE,
         MED_ID,
         MED_NAME,
         MED_DESC,
@@ -43,7 +40,7 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
         @Override
         public String toString() {
             switch (this) {
-                case TABLE_NAME:
+                case TABLE_MEDICINE:
                     return "medicine";
                 case MED_ID:
                     return "id";

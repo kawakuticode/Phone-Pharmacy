@@ -36,7 +36,7 @@ import java.util.List;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-import static com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler.MedColumns.TABLE_NAME;
+import static com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler.MedColumns.TABLE_MEDICINE;
 
 /**
  * Created by Russelius on 31/01/16.
@@ -213,7 +213,7 @@ public class MedicinesFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_item_export:
                 DataBaseMedsHandler.init(getContext());
-                new ExportDataBaseToFile(getContext(), db, file_name, TABLE_NAME).execute();
+                new ExportDataBaseToFile(getContext(), db, file_name, TABLE_MEDICINE.toString()).execute();
                 break;
             case R.id.menu_item_import:
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);

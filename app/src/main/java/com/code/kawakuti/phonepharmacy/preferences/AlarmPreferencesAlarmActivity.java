@@ -15,8 +15,11 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -35,7 +38,7 @@ import com.code.kawakuti.phonepharmacy.service.AlarmServiceBroadcastReciever;
 import java.util.Calendar;
 
 
-public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements View.OnClickListener{
+public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Alarm alarm;
     private MediaPlayer mediaPlayer;
@@ -43,22 +46,26 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
     private ListView listView;
     private Button add_alarm, cancel_alarm;
     private EditText input;
+    private AlertDialog.Builder alert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.alarm_preferences);
+
         add_alarm = (Button) findViewById(R.id.add_alarm);
         cancel_alarm = (Button) findViewById(R.id.cancel_alarm);
-
         add_alarm.setOnClickListener(this);
         cancel_alarm.setOnClickListener(this);
+        input = new EditText(AlarmPreferencesAlarmActivity.this);
+
 
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey("alarm")) {
             setMyAlarm((Alarm) bundle.getSerializable("alarm"));
+            input.setText(getMyAlarm().getAlarmName().toString());
+
         } else {
             setMyAlarm(new Alarm());
         }
@@ -68,6 +75,11 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
             setListAdapter(new AlarmPreferenceListAdapter(this, getMyAlarm()));
         }
 
+        alert = new AlertDialog.Builder(AlarmPreferencesAlarmActivity.this);
+        if(input.getParent()!=null)
+            ((ViewGroup)input.getParent()).removeView(input); // <- fix
+        alert.setView(input);
+
         getListView().setOnItemClickListener(new OnItemClickListener() {
 
             @Override
@@ -75,7 +87,6 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
                 final AlarmPreferenceListAdapter alarmPreferenceListAdapter = (AlarmPreferenceListAdapter) getListAdapter();
                 final AlarmPreference alarmPreference = (AlarmPreference) alarmPreferenceListAdapter.getItem(position);
 
-                AlertDialog.Builder alert;
                 v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 switch (alarmPreference.getType()) {
                     case BOOLEAN:
@@ -97,27 +108,21 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
                         alarmPreference.setValue(checked);
                         break;
                     case STRING:
-
-                        alert = new AlertDialog.Builder(AlarmPreferencesAlarmActivity.this);
-                        alert.setTitle(alarmPreference.getTitle());
-
+                            alert.setTitle(alarmPreference.getTitle());
                         // Set an EditText view to get user input
-                        input = new EditText(AlarmPreferencesAlarmActivity.this);
-                        input.setText(alarmPreference.getValue().toString());
-                        alert.setView(input);
 
                         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
                             public void onClick(DialogInterface dialog, int whichButton) {
 
                                 alarmPreference.setValue(input.getText().toString());
 
                                 if (alarmPreference.getKey() == AlarmPreference.Key.ALARM_NAME) {
                                     alarm.setAlarmName(alarmPreference.getValue().toString());
-
                                 }
-
                                 alarmPreferenceListAdapter.setMyAlarm(getMyAlarm());
                                 alarmPreferenceListAdapter.notifyDataSetChanged();
+
                             }
 
                         });
@@ -125,9 +130,7 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
                         break;
                     case LIST:
                         alert = new AlertDialog.Builder(AlarmPreferencesAlarmActivity.this);
-
                         alert.setTitle(alarmPreference.getTitle());
-
                         CharSequence[] items = new CharSequence[alarmPreference.getOptions().length];
                         for (int i = 0; i < items.length; i++)
                             items[i] = alarmPreference.getOptions()[i];
@@ -270,7 +273,6 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
     }
 
 
-
     private CountDownTimer alarmToneTimer;
 
     @Override
@@ -361,6 +363,35 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
                 finish();
         }
     }
+
+    private class MyTextWatcher implements TextWatcher {
+
+        private EditText txt;
+
+        public MyTextWatcher(EditText view) {
+            this.txt = view;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            validateAlarmName(txt);
+        }
+
+    }
+
+
+
 }
+
 
 

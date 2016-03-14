@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,14 +28,11 @@ import android.widget.Toast;
 
 import com.code.kawakuti.phonepharmacy.R;
 import com.code.kawakuti.phonepharmacy.database.DataBaseAlarmsHandler;
-import com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler;
 import com.code.kawakuti.phonepharmacy.database.ExportDataBaseToFile;
 import com.code.kawakuti.phonepharmacy.preferences.AlarmPreferencesAlarmActivity;
 import com.code.kawakuti.phonepharmacy.service.AlarmServiceBroadcastReciever;
 
 import java.util.List;
-
-import static com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler.MedColumns.TABLE_NAME;
 
 public class AlarmActivity extends Fragment implements View.OnClickListener{
 
@@ -40,7 +40,7 @@ public class AlarmActivity extends Fragment implements View.OnClickListener{
 	ListView alarmListView;
 	AlarmListAdapter alarmListAdapter;
 	View rootView;
-	private DataBaseMedsHandler db;
+	private DataBaseAlarmsHandler db;
 	private String file_name = "alarm_data_base_back_up.csv";
 
 	@Override
@@ -48,6 +48,7 @@ public class AlarmActivity extends Fragment implements View.OnClickListener{
 		rootView = inflater.inflate(R.layout.alarm_activity, container, false);
 		alarmListView = (ListView)rootView.findViewById(android.R.id.list);
 		alarmListView.setLongClickable(true);
+
 		setHasOptionsMenu(true);
 		alarmListView.setOnItemLongClickListener(new OnItemLongClickListener() {
 			@Override
@@ -149,8 +150,10 @@ public class AlarmActivity extends Fragment implements View.OnClickListener{
 			CheckBox checkBox = (CheckBox) v;
 			Alarm alarm = (Alarm) alarmListAdapter.getItem((Integer) checkBox.getTag());
 			alarm.setAlarmActive(checkBox.isChecked());
+			DataBaseAlarmsHandler.init(getContext());
 			DataBaseAlarmsHandler.update(alarm);
 			AlarmActivity.this.callAlarmScheduleService();
+			DataBaseAlarmsHandler.deactivate();
 			if (checkBox.isChecked()) {
 				Toast.makeText(getContext(), alarm.getTimeUntilNextAlarmMessage(), Toast.LENGTH_LONG).show();
 			}
@@ -174,9 +177,9 @@ public class AlarmActivity extends Fragment implements View.OnClickListener{
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.menu_item_export:
-
-				DataBaseAlarmsHandler.init(getContext());
-				new ExportDataBaseToFile(getContext(), db  , file_name , TABLE_NAME).execute();
+				Log.d("DaTABASE TABLE " , DataBaseAlarmsHandler.ALARM_TABLE) ;
+				db = new DataBaseAlarmsHandler(getContext());
+				new ExportDataBaseToFile(getContext(), db  , file_name , DataBaseAlarmsHandler.ALARM_TABLE).execute();
 
 				break;
 			case R.id.menu_item_import :
@@ -185,5 +188,8 @@ public class AlarmActivity extends Fragment implements View.OnClickListener{
 		}
 		return super.onOptionsItemSelected(item);
 	}
+
+
+
 
 }

@@ -37,8 +37,43 @@ public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 	public static final String COLUMN_ALARM_DAYS = "alarm_days";
 	public static final String COLUMN_ALARM_TONE = "alarm_tone";
 	public static final String COLUMN_ALARM_VIBRATE = "alarm_vibrate";
-	public static final String COLUMN_ALARM_NAME = "alarm_name";	
-	
+	public static final String COLUMN_ALARM_NAME = "alarm_name";
+
+	public enum AlarmColumns {
+		TABLE_ALARM,
+		ALARM_ID,
+		ALARM_ACTIVE,
+		ALARM_TIME,
+		ALARM_DAYS,
+		ALARM_TONE,
+		ALARM_VIBRATE,
+		ALARM_NAME;
+
+		@Override
+		public String toString() {
+			switch (this) {
+				case TABLE_ALARM:
+					return "alarm";
+				case ALARM_ID:
+					return "_id";
+				case ALARM_ACTIVE:
+					return "alarm_active";
+				case ALARM_TIME:
+					return "alarm_time";
+
+				case ALARM_DAYS:
+					return "alarm_days";
+				case ALARM_TONE:
+					return "alarm_tone";
+				case ALARM_VIBRATE:
+					return "alarm_vibrate";
+				case ALARM_NAME:
+					return "alarm_name";
+			}
+			return super.toString();
+		}
+	}
+
 	public static void init(Context context) {
 		if (null == instance) {
 			instance = new DataBaseAlarmsHandler(context);
@@ -132,7 +167,6 @@ public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 		Alarm alarm = null;
 		
 		if(c.moveToFirst()){
-			
 			alarm =  new Alarm();
 			alarm.setId(c.getInt(1));
 			alarm.setAlarmActive(c.getInt(2)==1);
@@ -178,7 +212,7 @@ public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 				null);
 	}
 
-	 DataBaseAlarmsHandler(Context context) {
+	 public DataBaseAlarmsHandler(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
