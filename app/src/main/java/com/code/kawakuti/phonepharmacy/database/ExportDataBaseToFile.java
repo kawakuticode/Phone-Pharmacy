@@ -117,7 +117,7 @@ public class ExportDataBaseToFile extends AsyncTask<String, Void, Boolean> {
                 value = String.valueOf(cursor.getFloat(position));
                 break;
             case 3:
-                value = String.valueOf(cursor.getString(position));
+                value = cursor.getString(position);
                 break;
             case 4:
                 value = String.valueOf(cursor.getBlob(position));

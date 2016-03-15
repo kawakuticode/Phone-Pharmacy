@@ -18,8 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -60,11 +60,11 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
         input = new EditText(AlarmPreferencesAlarmActivity.this);
 
 
-
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey("alarm")) {
             setMyAlarm((Alarm) bundle.getSerializable("alarm"));
             input.setText(getMyAlarm().getAlarmName().toString());
+            System.out.println("NAME ----> " +  input.getText().toString());
 
         } else {
             setMyAlarm(new Alarm());
@@ -75,10 +75,10 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
             setListAdapter(new AlarmPreferenceListAdapter(this, getMyAlarm()));
         }
 
-        alert = new AlertDialog.Builder(AlarmPreferencesAlarmActivity.this);
+       /*
         if(input.getParent()!=null)
             ((ViewGroup)input.getParent()).removeView(input); // <- fix
-        alert.setView(input);
+        alert.setView(input);*/
 
         getListView().setOnItemClickListener(new OnItemClickListener() {
 
@@ -86,7 +86,7 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
             public void onItemClick(AdapterView<?> l, View v, int position, long id) {
                 final AlarmPreferenceListAdapter alarmPreferenceListAdapter = (AlarmPreferenceListAdapter) getListAdapter();
                 final AlarmPreference alarmPreference = (AlarmPreference) alarmPreferenceListAdapter.getItem(position);
-
+                alert = new AlertDialog.Builder(AlarmPreferencesAlarmActivity.this);
                 v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 switch (alarmPreference.getType()) {
                     case BOOLEAN:
@@ -108,25 +108,33 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
                         alarmPreference.setValue(checked);
                         break;
                     case STRING:
-                            alert.setTitle(alarmPreference.getTitle());
-                        // Set an EditText view to get user input
 
-                        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        AlertDialog alertDialog = new AlertDialog.Builder(AlarmPreferencesAlarmActivity.this).create();
 
-                            public void onClick(DialogInterface dialog, int whichButton) {
+                        // Inflate and set the layout for the dialog
+                        // Pass null as the parent view because its going in the dialog layout
+                        LayoutInflater inflater = AlarmPreferencesAlarmActivity.this.getLayoutInflater();
+                        View view = inflater.inflate(R.layout.dialog_add_name_alarm, null);
+                        final EditText name_alarm = (EditText) view.findViewById(R.id.alarm_med_name);
+                        name_alarm.setText(input.getText().toString());
 
-                                alarmPreference.setValue(input.getText().toString());
+                        alertDialog.setView(view);
+                        alertDialog.setTitle(alarmPreference.getTitle());
+
+                        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                //check input for while.
+                                input.setText(name_alarm.getText().toString());
+                                alarmPreference.setValue(name_alarm.getText().toString());
 
                                 if (alarmPreference.getKey() == AlarmPreference.Key.ALARM_NAME) {
                                     alarm.setAlarmName(alarmPreference.getValue().toString());
                                 }
                                 alarmPreferenceListAdapter.setMyAlarm(getMyAlarm());
                                 alarmPreferenceListAdapter.notifyDataSetChanged();
-
                             }
-
                         });
-                        alert.show();
+                        alertDialog.show();
                         break;
                     case LIST:
                         alert = new AlertDialog.Builder(AlarmPreferencesAlarmActivity.this);
@@ -388,7 +396,6 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
         }
 
     }
-
 
 
 }

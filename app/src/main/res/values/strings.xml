@@ -50,4 +50,5 @@
     <string name="menu_item_3km">3km</string>
     <string name="menu_export_data">export database</string>
     <string name="menu_import_data">import database</string>
+    <string name="med_name_string">Medicine to take</string>
 </resources>

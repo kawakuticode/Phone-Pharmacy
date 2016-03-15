@@ -6,9 +6,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -28,11 +28,16 @@ import com.code.kawakuti.phonepharmacy.R;
 import com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler;
 import com.code.kawakuti.phonepharmacy.database.ExportDataBaseToFile;
 
-import java.io.FileDescriptor;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -52,7 +57,7 @@ public class MedicinesFragment extends Fragment {
     private List<Med> listMeds = new ArrayList<Med>();
     private DataBaseMedsHandler db;
     private ImageLoader loaderImg;
-    private String import_file_path;
+    private String import_file_path = "/PhoneParmacy/medicine_data_base_back_up.csv";
     private String options[] = new String[]{"Update", "Delete", "Cancel"};
     View rootView;
     private String file_name = "medicine_data_base_back_up.csv";
@@ -60,7 +65,6 @@ public class MedicinesFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         outState.putSerializable("file_uri", import_file_path);
     }
 
@@ -79,7 +83,7 @@ public class MedicinesFragment extends Fragment {
         db = new DataBaseMedsHandler(getContext());
         medicineListView = (ListView) rootView.findViewById(R.id.list);
         loaderImg = new ImageLoader(this.getContext());
-        listMeds = db.getAllMedsList() ;
+        listMeds = db.getAllMedsList();
         medicineAdapter = new MedicineAdapter(this.getContext(), listMeds, loaderImg);
         medicineListView.setAdapter(medicineAdapter);
         registerForContextMenu(medicineListView);
@@ -138,7 +142,6 @@ public class MedicinesFragment extends Fragment {
 
     @Override
     public void onResume() {
-
         super.onResume();
         updateListMeds();
     }
@@ -216,12 +219,21 @@ public class MedicinesFragment extends Fragment {
                 new ExportDataBaseToFile(getContext(), db, file_name, TABLE_MEDICINE.toString()).execute();
                 break;
             case R.id.menu_item_import:
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("*/*");
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                startActivityForResult(
-                        Intent.createChooser(intent, "Select File"),
-                        SELECT_FILE);
+                String path = getImport_file_path(import_file_path);
+                if (!path.toString().isEmpty()) {
+                    new ImportCSVToDataBaseTask(path).execute();
+                } else
+                    Toast.makeText(getActivity(), "No preview DataBase to import", Toast.LENGTH_LONG).show();
+
+                //    import_file_path = data.getData().getPath();
+                //  new ImportCSVToDataBaseTask(data.getData()).execute();
+
+                //   Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                // intent.setType("*/*");
+                //intent.addCategory(Intent.CATEGORY_OPENABLE);
+                // startActivityForResult(Intent.createChooser(intent, "Select File"),
+                ///       SELECT_FILE);
+
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -236,7 +248,7 @@ public class MedicinesFragment extends Fragment {
                 if (resultCode == getActivity().RESULT_OK) {
                     // Get the Uri of the selected file
                     import_file_path = data.getData().getPath();
-                    new ImportCSVToDataBaseTask(data.getData()).execute();
+                    new ImportCSVToDataBaseTask(import_file_path).execute();
                 }
                 break;
         }
@@ -245,10 +257,10 @@ public class MedicinesFragment extends Fragment {
 
     public class ImportCSVToDataBaseTask extends AsyncTask<String, Void, Long> {
         private final ProgressDialog dialog = new ProgressDialog(getContext());
-        private Uri file_path;
+        private String file_path;
         Long result;
 
-        public ImportCSVToDataBaseTask(Uri path) {
+        public ImportCSVToDataBaseTask(String path) {
             this.file_path = path;
         }
 
@@ -256,28 +268,35 @@ public class MedicinesFragment extends Fragment {
         protected Long doInBackground(String... params) {
             ParcelFileDescriptor pFileDescriptor = null;
             DataBaseMedsHandler.init(getContext());
+
             db.getWritableDatabase().beginTransaction();
             try {
-                pFileDescriptor = getContext().getContentResolver().openFileDescriptor(file_path, "r");
-                FileDescriptor fileDescriptor = pFileDescriptor.getFileDescriptor();
+                /*pFileDescriptor = getContext().getContentResolver().openFileDescriptor(file_path, "r");
+                FileDescriptor fileDescriptor = pFileDescriptor.getFileDescriptor();*/
 
-
-                CSVReader reader = new CSVReader(new FileReader(fileDescriptor));
+                CSVReader reader = new CSVReader(new FileReader(file_path));
                 String[] nextLine;
                 //here I am just displaying the CSV file contents, and you can store your file content into db from while loop...
-
+                boolean first_line = true;
                 while ((nextLine = reader.readNext()) != null) {
                     if (nextLine.length != 5) {
                         Log.d("CSVParser", "Skipping Bad CSV Row");
                         continue;
                     }
-                    ContentValues cv = new ContentValues();
-                    // cv.put("id", nextLine[0].trim());
-                    cv.put("name", nextLine[1].trim());
-                    cv.put("description", nextLine[2].trim());
-                    cv.put("expirationDate", nextLine[3].trim());
-                    cv.put("srcImage", nextLine[4].trim());
-                    Log.d("INSERTION --> ", db.getWritableDatabase().insert("medicine", null, cv) + " <---");
+                    if (first_line) {
+                        first_line = false;
+                        continue;
+                    } else {
+
+                        Log.d("INSERTION --> ", nextLine[2].trim());
+                        ContentValues cv = new ContentValues();
+                        // cv.put("id", nextLine[0].trim());
+                        cv.put(DataBaseMedsHandler.COLUMN_MED_NAME, nextLine[1].trim());
+                        cv.put(DataBaseMedsHandler.COLUMN_MED_DESCRIPTION, nextLine[2].trim());
+                        cv.put(DataBaseMedsHandler.COLUMN_MED_EXPIREDATE, DataBaseMedsHandler.persistDate(LongToDate(nextLine[3].trim())));
+                        cv.put(DataBaseMedsHandler.COLUMN_MED_SRCIMG, nextLine[4].trim());
+                        db.getWritableDatabase().insert(DataBaseMedsHandler.MED_TABLE, null, cv);
+                    }
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -314,4 +333,42 @@ public class MedicinesFragment extends Fragment {
             }
         }
     }
+
+    public String getImport_file_path(String file_path) {
+        String state = Environment.getExternalStorageState();
+        String path;
+
+        if (!Environment.MEDIA_MOUNTED.equals(state)) {
+            path = "";
+        } else {
+            File import_file = new File(Environment.getExternalStorageDirectory(), file_path);
+            if (!import_file.exists()) {
+                path = "";
+            } else {
+                path = import_file.getAbsolutePath();
+            }
+        }
+        return path;
+    }
+
+
+    public Date LongToDate(String longValue) {
+        Calendar c = Calendar.getInstance();
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Long time;
+        Date date = null;
+
+        try {
+            time = Long.parseLong(longValue);
+            date  = new Date(TimeUnit.SECONDS.toMillis(time) );
+            //date = new Date(time);
+            System.out.println("Correct date time value: " + df.format(date));
+
+        } catch (NumberFormatException format) {
+            format.printStackTrace();
+        }
+        return date;
+    }
+
 }
