@@ -211,15 +211,14 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
     }
 
 
-    private String changeButtonTextToPath(String path) {
-        String result = "";
-        if (path != null ) {
-            String[] path_parts = path.split("/");
-            result = path_parts[path_parts.length - 1];
-        } else {
-            result = "select photo";
-        }
-        return result;
+    public String changeButtonTextToPath(String path) {
+
+        return !path.isEmpty() ? splitedPath(path)[splitedPath(path).length - 1] : "select photo";
+
+    }
+
+    public String[] splitedPath(String input) {
+        return input.split("/");
     }
 
     public Uri getOutputMediaFileUri(int type) {

@@ -19,6 +19,7 @@ public class Alarm implements Serializable {
 
 
     public enum Day {
+
         SUNDAY,
         MONDAY,
         TUESDAY,
@@ -26,6 +27,7 @@ public class Alarm implements Serializable {
         THURSDAY,
         FRIDAY,
         SATURDAY;
+
 
         @Override
         public String toString() {

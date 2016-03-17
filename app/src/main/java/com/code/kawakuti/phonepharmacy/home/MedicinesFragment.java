@@ -2,7 +2,6 @@ package com.code.kawakuti.phonepharmacy.home;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,13 +30,9 @@ import com.code.kawakuti.phonepharmacy.database.ExportDataBaseToFile;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -221,12 +216,12 @@ public class MedicinesFragment extends Fragment {
             case R.id.menu_item_import:
                 String path = getImport_file_path(import_file_path);
                 if (!path.toString().isEmpty()) {
-                    new ImportCSVToDataBaseTask(path).execute();
+                    new ImportCSVMedicineFileToDataBaseTask(path).execute();
                 } else
                     Toast.makeText(getActivity(), "No preview DataBase to import", Toast.LENGTH_LONG).show();
 
                 //    import_file_path = data.getData().getPath();
-                //  new ImportCSVToDataBaseTask(data.getData()).execute();
+                //  new ImportCSVMedicineFileToDataBaseTask(data.getData()).execute();
 
                 //   Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 // intent.setType("*/*");
@@ -248,19 +243,19 @@ public class MedicinesFragment extends Fragment {
                 if (resultCode == getActivity().RESULT_OK) {
                     // Get the Uri of the selected file
                     import_file_path = data.getData().getPath();
-                    new ImportCSVToDataBaseTask(import_file_path).execute();
+                    new ImportCSVMedicineFileToDataBaseTask(import_file_path).execute();
                 }
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public class ImportCSVToDataBaseTask extends AsyncTask<String, Void, Long> {
+    private class ImportCSVMedicineFileToDataBaseTask extends AsyncTask<String, Void, Long> {
         private final ProgressDialog dialog = new ProgressDialog(getContext());
         private String file_path;
         Long result;
 
-        public ImportCSVToDataBaseTask(String path) {
+        public ImportCSVMedicineFileToDataBaseTask(String path) {
             this.file_path = path;
         }
 
@@ -288,14 +283,12 @@ public class MedicinesFragment extends Fragment {
                         continue;
                     } else {
 
-                        Log.d("INSERTION --> ", nextLine[2].trim());
-                        ContentValues cv = new ContentValues();
-                        // cv.put("id", nextLine[0].trim());
-                        cv.put(DataBaseMedsHandler.COLUMN_MED_NAME, nextLine[1].trim());
-                        cv.put(DataBaseMedsHandler.COLUMN_MED_DESCRIPTION, nextLine[2].trim());
-                        cv.put(DataBaseMedsHandler.COLUMN_MED_EXPIREDATE, DataBaseMedsHandler.persistDate(LongToDate(nextLine[3].trim())));
-                        cv.put(DataBaseMedsHandler.COLUMN_MED_SRCIMG, nextLine[4].trim());
-                        db.getWritableDatabase().insert(DataBaseMedsHandler.MED_TABLE, null, cv);
+                        Med tmp = new Med();
+                        tmp.setName(nextLine[1].trim());
+                        tmp.setDescription(nextLine[2].trim());
+                        tmp.setExpireDate(LongToDate(nextLine[3].trim()));
+                        tmp.setSrcImage(nextLine[4].trim());
+                        db.addMed(tmp);
                     }
                 }
             } catch (IOException e1) {
@@ -353,18 +346,13 @@ public class MedicinesFragment extends Fragment {
 
 
     public Date LongToDate(String longValue) {
-        Calendar c = Calendar.getInstance();
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-        df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Long time;
+        //  Calendar c = Calendar.getInstance();
+        // DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        //df.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = null;
-
         try {
-            time = Long.parseLong(longValue);
-            date  = new Date(TimeUnit.SECONDS.toMillis(time) );
-            //date = new Date(time);
-            System.out.println("Correct date time value: " + df.format(date));
-
+            date = new Date(Long.parseLong(longValue));
+            //date = new Date(TimeUnit.SECONDS.toMillis(time));
         } catch (NumberFormatException format) {
             format.printStackTrace();
         }

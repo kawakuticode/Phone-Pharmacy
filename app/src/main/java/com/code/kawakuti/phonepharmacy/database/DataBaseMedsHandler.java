@@ -114,7 +114,9 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
      */
 
     public static Long persistDate(Date date) {
+        System.out.println("LONG TIME Persisted  " + date.getTime());
         return date != null ? date.getTime() : null;
+
     }
 
     /**
@@ -124,9 +126,29 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
      * @return
      */
     public static Date loadDate(Cursor cursor, int index) {
+        System.out.println("LONG TIME LOADED  " + new Date(cursor.getLong(index)).getTime());
         return cursor.isNull(index) ? null : new Date(cursor.getLong(index));
     }
+    /*public Date LongToDate(String longValue) {
+        //  Calendar c = Calendar.getInstance();
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+        Long time;
+        Date date = null;
+
+        try {
+            time = Long.parseLong(longValue);
+            date  = new Date(TimeUnit.SECONDS.toMillis(time) );
+            //date = new Date(time);
+            System.out.println("Correct date time value: " + df.format(date));
+            System.out.println("LONG TIME  " + time);
+
+        } catch (NumberFormatException format) {
+            format.printStackTrace();
+        }
+        return date;
+    }*/
     /**
      * This method is used to add Med to Meds Table
      *

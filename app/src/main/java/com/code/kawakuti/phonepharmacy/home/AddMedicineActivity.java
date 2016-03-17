@@ -205,15 +205,13 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
     }
 
 
-    private String changeButtonTextToPath(String path) {
-        String result = "";
-        if (path.length() != 0) {
-            String[] path_parts = path.split("/");
-            result = path_parts[path_parts.length - 1];
-        } else {
-            result = "select photo";
-        }
-        return result;
+
+    public String changeButtonTextToPath(String path) {
+        return !path.isEmpty() ? splitedPath(path)[splitedPath(path).length - 1] : "select photo";
+    }
+
+    public String[] splitedPath(String input) {
+        return input.split("/");
     }
 
     /*

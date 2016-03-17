@@ -12,6 +12,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -107,22 +109,63 @@ public class ExportDataBaseToFile extends AsyncTask<String, Void, Boolean> {
 
         String value = "";
         switch (cursor.getType(position)) {
-            case 0:
+            case Cursor.FIELD_TYPE_NULL:
                 value = "";
                 break;
-            case 1:
-                value = String.valueOf(cursor.getInt(position));
+            case Cursor.FIELD_TYPE_INTEGER:
+                value = String.valueOf(cursor.getLong(position));
+                System.out.println("position  - > " + position + "type  - > " + cursor.getType(position));
                 break;
-            case 2:
+            case Cursor.FIELD_TYPE_FLOAT:
                 value = String.valueOf(cursor.getFloat(position));
+                System.out.println("position  - > " + position + "type  - > " + cursor.getType(position));
                 break;
-            case 3:
+            case Cursor.FIELD_TYPE_STRING:
                 value = cursor.getString(position);
+                System.out.println("position  - > " + position + "type  - > " + cursor.getType(position));
                 break;
-            case 4:
-                value = String.valueOf(cursor.getBlob(position));
+            case Cursor.FIELD_TYPE_BLOB:
+                if (db instanceof DataBaseAlarmsHandler) {
+
+                    try {
+
+                        String tmp = new String(bin2String(cursor.getBlob(position)), "UTF-8");
+                        value = cleanString(tmp);
+
+                        System.out.println(" String tmp --->  " + tmp.toString());
+                        System.out.println(" String Code   --->  " + value);
+
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+
+                    value = String.valueOf(cursor.getBlob(position));
+                }
+
+                System.out.println("position  - > " + position + "type  - > " + cursor.getType(position));
                 break;
         }
         return value;
     }
+
+
+    public byte[] bin2String(byte[] blob) {
+
+        String xpt = Arrays.toString(blob);
+        System.out.println(" input --->  " + xpt);
+        String[] byteValues = xpt.substring(1, xpt.length() - 1).split(",");
+
+        byte[] bytes = new byte[byteValues.length];
+        for (int i = 0; i < byteValues.length; i++) {
+            bytes[i] = Byte.parseByte(byteValues[i].trim());
+        }
+        return bytes;
+    }
+
+    public String cleanString(String x) {
+        return x.substring(x.indexOf("xpt") + 2, x.length()).replaceAll("\\W", "").replace("t", "").replace("q", ",");
+    }
+
 }

@@ -73,6 +73,7 @@ public class MedicineAdapter extends BaseAdapter {
                     viewHolder.exp_date.setText(convertStringToDate(medicine.getExpireDate()));
                     break;
                 case 1:
+                    viewHolder.exp_date.setTextColor(Color.parseColor("#10bcc9"));
                     viewHolder.exp_date.setText(convertStringToDate(medicine.getExpireDate()));
                     break;
             }
