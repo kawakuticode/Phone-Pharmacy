@@ -38,6 +38,7 @@ import com.code.kawakuti.phonepharmacy.service.AlarmServiceBroadcastReciever;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -239,12 +240,12 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
                         Alarm tmp = new Alarm();
                         tmp.setAlarmActive(integerToBoolean(ParserStringToInt(nextLine[1].trim())));
                         tmp.setAlarmTime(nextLine[2].trim());
-                        tmp.setDays(Day.values());
+                        tmp.setDays(arrayToDay(nextLine[3].trim()));
                         tmp.setAlarmTonePath(nextLine[4].trim());
                         tmp.setVibrate(integerToBoolean(ParserStringToInt(nextLine[5].trim())));
                         tmp.setAlarmName(nextLine[6].trim());
-                        //System.out.println(" DAY STRING " + nextLine[3].trim());
-                        printDays(stringToDay(nextLine[3].trim()));
+                        //System.out.println("DAY STRING" + nextLine[3].trim());
+
                         // stringToDay(nextLine[3].trim());
                         DataBaseAlarmsHandler.create(tmp);
 
@@ -319,23 +320,61 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
         return path;
     }
 
-    public Day[] stringToDay(String days) {
-        String[] arrayDays = days.split(",");
-        Day[] daysAlarm = new Day[arrayDays.length];
-
+    public Day[] arrayToDay(String days_string) {
+        String[] arrayDays = days_string.split(",");
+        LinkedList<Day> days = new LinkedList<>();
 
         for (int i = 0; i < arrayDays.length - 1; i++) {
-            //   System.out.print(Day.values()[i]);
-        //    daysAlarm[i] ="Day.Monday" ;
+            days.add(stringToDay(arrayDays[i]));
         }
-        return daysAlarm;
+        return days.toArray(new Day[days.size()]);
+    }
+
+
+    public Day stringToDay(String dayIn) {
+        Day tmp = null;
+        switch (dayIn) {
+            case "MONDAY":
+                tmp = Day.MONDAY;
+                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
+                break;
+            case "TUESDAY":
+                tmp = Day.TUESDAY;
+                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
+
+                break;
+            case "WEDNESDAY":
+                tmp = Day.WEDNESDAY;
+                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
+                break;
+            case "THURSDAY":
+                tmp = Day.THURSDAY;
+                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
+                break;
+            case "FRIDAY":
+                tmp = Day.FRIDAY;
+                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
+                break;
+            case "SATURDAY":
+                tmp = Day.SATURDAY;
+                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
+                break;
+            case "SUNDAY":
+                tmp = Day.SUNDAY;
+                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
+                break;
+           /* default:
+                return null;*/
+        }
+        return tmp;
+
     }
 
     public void printDays(Day[] d) {
         if (d.length != 0) {
-            for (Day dx : d) {
-                dx.toString();
-            }
+
+            System.out.println("size - > " + d);
+
         }
     }
 }

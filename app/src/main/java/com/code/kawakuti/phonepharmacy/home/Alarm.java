@@ -19,7 +19,6 @@ public class Alarm implements Serializable {
 
 
     public enum Day {
-
         SUNDAY,
         MONDAY,
         TUESDAY,
@@ -61,10 +60,10 @@ public class Alarm implements Serializable {
     private Boolean vibrate = true;
     private String alarmName = "";
 
+
+
     public Alarm() {
-
     }
-
 
     /**
      * @return the alarmActive
@@ -228,11 +227,10 @@ public class Alarm implements Serializable {
             Arrays.sort(getDays(), new Comparator<Day>() {
                 @Override
                 public int compare(Day lhs, Day rhs) {
-
                     return lhs.ordinal() - rhs.ordinal();
                 }
             });
-            for (Day d : getDays()) {
+          for (Day d : getDays()) {
                 switch (d) {
                     case TUESDAY:
                     case THURSDAY:
@@ -242,7 +240,7 @@ public class Alarm implements Serializable {
                 }
                 daysStringBuilder.append(',');
             }
-            daysStringBuilder.setLength(daysStringBuilder.length() - 1);
+           daysStringBuilder.setLength(daysStringBuilder.length() - 1);
         }
 
         return daysStringBuilder.toString();
