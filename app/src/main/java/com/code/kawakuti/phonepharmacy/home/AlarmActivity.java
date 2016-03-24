@@ -1,5 +1,4 @@
 package com.code.kawakuti.phonepharmacy.home;
-
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
@@ -9,7 +8,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -44,7 +42,6 @@ import java.util.List;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class AlarmActivity extends Fragment implements View.OnClickListener {
-
     ImageButton newButton;
     ListView alarmListView;
     AlarmListAdapter alarmListAdapter;
@@ -58,7 +55,6 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
         rootView = inflater.inflate(R.layout.alarm_activity, container, false);
         alarmListView = (ListView) rootView.findViewById(android.R.id.list);
         alarmListView.setLongClickable(true);
-
         setHasOptionsMenu(true);
         alarmListView.setOnItemLongClickListener(new OnItemLongClickListener() {
             @Override
@@ -75,7 +71,6 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
                         DataBaseAlarmsHandler.deleteEntry(alarm);
                         AlarmActivity.this.callAlarmScheduleService();
                         DataBaseAlarmsHandler.deactivate();
-
                         updateAlarmList();
                     }
                 });
@@ -85,15 +80,11 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
                         dialog.dismiss();
                     }
                 });
-
                 dialog.show();
-
                 return true;
             }
         });
-
         callAlarmScheduleService();
-
         alarmListAdapter = new AlarmListAdapter(this);
         this.alarmListView.setAdapter(alarmListAdapter);
         alarmListView.setOnItemClickListener(new OnItemClickListener() {
@@ -112,16 +103,13 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Toast.makeText(getContext(), "add alarm to take medicine", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getContext(), AlarmPreferencesAlarmActivity.class);
                 startActivity(intent);
-
             }
         });
         return rootView;
     }
-
 
     @Override
     public void onPause() {
@@ -175,13 +163,11 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
         getContext().sendBroadcast(alarmServiceIntent, null);
     }
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.export_import_menu, menu);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -190,7 +176,6 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
                 Log.d("DaTABASE TABLE ", DataBaseAlarmsHandler.ALARM_TABLE);
                 db = new DataBaseAlarmsHandler(getContext());
                 new ExportDataBaseToFile(getContext(), db, file_name, DataBaseAlarmsHandler.ALARM_TABLE).execute();
-
                 break;
             case R.id.menu_item_import:
                 String path = getImport_file_path(import_file_path);
@@ -198,7 +183,6 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
                     new ImportCSVAlarmsFileToDataBaseTask(path).execute();
                 } else
                     Toast.makeText(getActivity(), "No preview DataBase to import", Toast.LENGTH_LONG).show();
-
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -207,60 +191,10 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
     private class ImportCSVAlarmsFileToDataBaseTask extends AsyncTask<String, Void, Long> {
         private final ProgressDialog dialog = new ProgressDialog(getContext());
         private String file_path;
-        Long result;
-
+        Long insertions = Long.valueOf(0);
         public ImportCSVAlarmsFileToDataBaseTask(String path) {
             this.file_path = path;
         }
-
-        @Override
-        protected Long doInBackground(String... params) {
-            ParcelFileDescriptor pFileDescriptor = null;
-
-            DataBaseAlarmsHandler.init(getContext());
-            //  db.getWritableDatabase().beginTransaction();
-            try {
-                /*pFileDescriptor = getContext().getContentResolver().openFileDescriptor(file_path, "r");
-                FileDescriptor fileDescriptor = pFileDescriptor.getFileDescriptor();*/
-
-                CSVReader reader = new CSVReader(new FileReader(file_path));
-                String[] nextLine;
-                //here I am just displaying the CSV file contents, and you can store your file content into db from while loop...
-                boolean first_line = true;
-                while ((nextLine = reader.readNext()) != null) {
-                 /*   if (nextLine.length != 8) {
-                        Log.d("CSVParser", "Skipping Bad CSV Row");
-                        continue;
-                    }*/
-                    if (first_line) {
-                        first_line = false;
-                        continue;
-                    } else {
-
-                        Alarm tmp = new Alarm();
-                        tmp.setAlarmActive(integerToBoolean(ParserStringToInt(nextLine[1].trim())));
-                        tmp.setAlarmTime(nextLine[2].trim());
-                        tmp.setDays(arrayToDay(nextLine[3].trim()));
-                        tmp.setAlarmTonePath(nextLine[4].trim());
-                        tmp.setVibrate(integerToBoolean(ParserStringToInt(nextLine[5].trim())));
-                        tmp.setAlarmName(nextLine[6].trim());
-                        //System.out.println("DAY STRING" + nextLine[3].trim());
-
-                        // stringToDay(nextLine[3].trim());
-                        DataBaseAlarmsHandler.create(tmp);
-
-                    }
-                }
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-
-            DataBaseAlarmsHandler.deactivate();
-
-            return Long.valueOf(-1);
-
-        }
-
 
         @Override
         protected void onPreExecute() {
@@ -269,6 +203,39 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
             this.dialog.setCancelable(false);
             this.dialog.show();
         }
+        @Override
+        protected Long doInBackground(String... params) {
+            DataBaseAlarmsHandler.init(getContext());
+            try {
+                CSVReader reader = new CSVReader(new FileReader(file_path));
+                String[] nextLine;
+                boolean first_line = true;
+                while ((nextLine = reader.readNext()) != null) {
+                 if (nextLine.length != 7) {
+                        Log.d("CSVParser ---> ", "Bad Csv File");
+                        continue;
+                    }
+                    if (first_line) {
+                        first_line = false;
+                        continue;
+                    } else {
+                        Alarm tmp = new Alarm();
+                        tmp.setAlarmActive(integerToBoolean(ParserStringToInt(nextLine[1].trim())));
+                        tmp.setAlarmTime(nextLine[2].trim());
+                        tmp.setDays(arrayToDay(nextLine[3].trim()));
+                        tmp.setAlarmTonePath(nextLine[4].trim());
+                        tmp.setVibrate(integerToBoolean(ParserStringToInt(nextLine[5].trim())));
+                        tmp.setAlarmName(nextLine[6].trim());
+                        insertions += DataBaseAlarmsHandler.create(tmp);
+                    }
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            DataBaseAlarmsHandler.deactivate();
+            return insertions;
+        }
+
 
         @Override
         protected void onPostExecute(Long check) {
@@ -276,12 +243,12 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
-            if (Long.valueOf(check) > 0) {
+            if (check > 0) {
                 updateAlarmList();
-                Toast.makeText(getContext(), "File is built Successfully!" + "\n", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "DataBase imported Successfully!" + "\n", Toast.LENGTH_LONG).show();
             } else {
                 updateAlarmList();
-                Toast.makeText(getContext(), "File fail to build", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Fail to import dataBase", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -292,7 +259,6 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
         try {
             x = Integer.valueOf(i);
         } catch (NumberFormatException f) {
-
             f.printStackTrace();
         }
         return x;
@@ -323,59 +289,38 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
     public Day[] arrayToDay(String days_string) {
         String[] arrayDays = days_string.split(",");
         LinkedList<Day> days = new LinkedList<>();
-
         for (int i = 0; i < arrayDays.length - 1; i++) {
             days.add(stringToDay(arrayDays[i]));
         }
         return days.toArray(new Day[days.size()]);
     }
 
-
     public Day stringToDay(String dayIn) {
         Day tmp = null;
         switch (dayIn) {
             case "MONDAY":
                 tmp = Day.MONDAY;
-                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
                 break;
             case "TUESDAY":
                 tmp = Day.TUESDAY;
-                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
-
                 break;
             case "WEDNESDAY":
                 tmp = Day.WEDNESDAY;
-                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
                 break;
             case "THURSDAY":
                 tmp = Day.THURSDAY;
-                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
                 break;
             case "FRIDAY":
                 tmp = Day.FRIDAY;
-                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
                 break;
             case "SATURDAY":
                 tmp = Day.SATURDAY;
-                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
                 break;
             case "SUNDAY":
                 tmp = Day.SUNDAY;
-                System.out.println("toString -> " + tmp.toString() + " name ->  " + tmp.name() + " ordinal ->" + tmp.ordinal());
                 break;
-           /* default:
-                return null;*/
         }
         return tmp;
-
-    }
-
-    public void printDays(Day[] d) {
-        if (d.length != 0) {
-
-            System.out.println("size - > " + d);
-
-        }
     }
 }
 

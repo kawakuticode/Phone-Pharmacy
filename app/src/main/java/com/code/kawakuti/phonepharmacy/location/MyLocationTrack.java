@@ -106,8 +106,8 @@ public class MyLocationTrack implements LocationListener {
 
         Location netLoc = null;
         Location gpsLoc = null;
-
         Location result = null;
+
         if (ActivityCompat.checkSelfPermission(myContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(myContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
