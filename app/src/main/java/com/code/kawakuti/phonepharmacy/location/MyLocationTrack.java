@@ -8,12 +8,10 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.io.StringWriter;
 
 /**
@@ -23,14 +21,10 @@ public class MyLocationTrack implements LocationListener {
     private static final String TAG = "LOCATIONTRACK";
     private Context myContext;
     private LocationManager mLocationManager;
-    private String bestProvider;
     private StringWriter output;
 
 
     private static long LOCATION_VALIDITY_DURATION_MS = 2 * 60 * 1000; // 2 min
-
-    private final static int LOCATION_TIMEOUT_MS = 30 * 1000; // 30 seconds
-    private Handler mHandler;
     Location result;
 
     public MyLocationTrack(Context mContext , LocationManager lm ) {
@@ -38,10 +32,6 @@ public class MyLocationTrack implements LocationListener {
         this.mLocationManager = lm;
         output = new StringWriter();
 
-    }
-
-    static void append(Appendable appendable, String c) throws IOException {
-        appendable.append(c);
     }
 
     public boolean isGpsLocationProviderEnabled() {
