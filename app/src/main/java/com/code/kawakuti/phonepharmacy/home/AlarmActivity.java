@@ -22,7 +22,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -42,7 +41,6 @@ import java.util.List;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class AlarmActivity extends Fragment implements View.OnClickListener {
-    ImageButton newButton;
     ListView alarmListView;
     AlarmListAdapter alarmListAdapter;
     View rootView;

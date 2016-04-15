@@ -269,7 +269,6 @@ public class MyLocationTrack implements LocationListener {
 
     @Override
     public void onProviderDisabled(String provider) {
-
         Toast.makeText(myContext, "provider  disable  " + provider.toString(),
                 Toast.LENGTH_SHORT).show();
         if (ActivityCompat.checkSelfPermission(myContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&

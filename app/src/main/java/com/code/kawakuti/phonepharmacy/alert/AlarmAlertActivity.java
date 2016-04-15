@@ -165,7 +165,7 @@ public class AlarmAlertActivity extends Activity implements OnClickListener {
         }
         try {
             mediaPlayer.release();
-            finishAndRemoveTask();
+            this.onDestroy();
         } catch (Exception e) {
 
         }
