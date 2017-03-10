@@ -8,13 +8,14 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.widget.Toast;
 
+import com.opencsv.CSVWriter;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-
-import au.com.bytecode.opencsv.CSVWriter;
+/*import au.com.bytecode.opencsv.CSVWriter;*/
 
 /**
  * Created by Russelius on 13/03/16.
@@ -67,9 +68,7 @@ public class ExportDataBaseToFile extends AsyncTask<String, Void, Boolean> {
                 File file = new File(exportDir, file_name);
                 file.createNewFile();
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
-                // db = new DataBaseMedsHandler(myContext);
                 Cursor curCSV = db.getReadableDatabase().rawQuery(select, null);
-                //System.out.println("DATABASES -->  " + db.getDatabaseName().toString());
 
                 csvWrite.writeNext(curCSV.getColumnNames());
 
@@ -87,7 +86,6 @@ public class ExportDataBaseToFile extends AsyncTask<String, Void, Boolean> {
 
                 return true;
             } catch (IOException e) {
-                //Log.e("EXPORT", e.getMessage(), e);
                 return false;
             }
         }
@@ -112,15 +110,12 @@ public class ExportDataBaseToFile extends AsyncTask<String, Void, Boolean> {
                 break;
             case Cursor.FIELD_TYPE_INTEGER:
                 value = String.valueOf(cursor.getLong(position));
-                //System.out.println("position  - > " + position + "type  - > " + cursor.getType(position));
                 break;
             case Cursor.FIELD_TYPE_FLOAT:
                 value = String.valueOf(cursor.getFloat(position));
-                // System.out.println("position  - > " + position + "type  - > " + cursor.getType(position));
                 break;
             case Cursor.FIELD_TYPE_STRING:
                 value = cursor.getString(position);
-                // System.out.println("position  - > " + position + "type  - > " + cursor.getType(position));
                 break;
             case Cursor.FIELD_TYPE_BLOB:
                 if (db instanceof DataBaseAlarmsHandler) {
@@ -130,8 +125,6 @@ public class ExportDataBaseToFile extends AsyncTask<String, Void, Boolean> {
                         String tmp = new String(bin2String(cursor.getBlob(position)), "UTF-8");
                         value = cleanString(tmp);
 
-                        //System.out.println(" String tmp --->  " + tmp.toString());
-                        //System.out.println(" String Code   --->  " + value);
 
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
@@ -142,7 +135,6 @@ public class ExportDataBaseToFile extends AsyncTask<String, Void, Boolean> {
                     value = String.valueOf(cursor.getBlob(position));
                 }
 
-                //System.out.println("position  - > " + position + "type  - > " + cursor.getType(position));
                 break;
         }
         return value;

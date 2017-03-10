@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,6 +23,7 @@ import com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler;
 import com.code.kawakuti.phonepharmacy.database.ExportDataBaseToFile;
 import com.code.kawakuti.phonepharmacy.home.AddMedicineActivity;
 import com.code.kawakuti.phonepharmacy.models.Med;
+import com.opencsv.CSVReader;
 
 import java.io.File;
 import java.io.FileReader;
@@ -31,8 +31,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import au.com.bytecode.opencsv.CSVReader;
 
 import static com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler.MedColumns.TABLE_MEDICINE;
 
@@ -181,13 +179,10 @@ public class MedicinesFragment extends Fragment {
     }
 
     public Date LongToDate(String longValue) {
-        //  Calendar c = Calendar.getInstance();
-        // DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-        //df.setTimeZone(TimeZone.getTimeZone("UTC"));
+
         Date date = null;
         try {
             date = new Date(Long.parseLong(longValue));
-            //date = new Date(TimeUnit.SECONDS.toMillis(time));
         } catch (NumberFormatException format) {
             format.printStackTrace();
         }
@@ -205,13 +200,10 @@ public class MedicinesFragment extends Fragment {
 
         @Override
         protected Long doInBackground(String... params) {
-            ParcelFileDescriptor pFileDescriptor = null;
             DataBaseMedsHandler.init(getContext());
-
+            int counter = 0;
             db.getWritableDatabase().beginTransaction();
             try {
-                /*pFileDescriptor = getContext().getContentResolver().openFileDescriptor(file_path, "r");
-                FileDescriptor fileDescriptor = pFileDescriptor.getFileDescriptor();*/
 
                 CSVReader reader = new CSVReader(new FileReader(file_path));
                 String[] nextLine;
@@ -233,6 +225,7 @@ public class MedicinesFragment extends Fragment {
                         tmp.setExpireDate(LongToDate(nextLine[3].trim()));
                         tmp.setSrcImage(nextLine[4].trim());
                         db.addMed(tmp);
+                        counter++;
                     }
                 }
             } catch (IOException e1) {
@@ -242,7 +235,7 @@ public class MedicinesFragment extends Fragment {
             db.getWritableDatabase().setTransactionSuccessful();
             db.getWritableDatabase().endTransaction();
             db.close();
-            return Long.valueOf(-1);
+            return (long) counter;
 
         }
 
@@ -258,15 +251,13 @@ public class MedicinesFragment extends Fragment {
         @Override
         protected void onPostExecute(Long check) {
             super.onPostExecute(check);
-            if (dialog.isShowing()) {
                 dialog.dismiss();
-            }
-            if (Long.valueOf(check) > 0) {
+            if (check > 0) {
                 updateListMeds();
-                Toast.makeText(getContext(), "File is built Successfully!" + "\n", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "imported back up Successfully!" + "\n", Toast.LENGTH_LONG).show();
             } else {
                 updateListMeds();
-                Toast.makeText(getContext(), "File fail to build", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "nothing to import", Toast.LENGTH_SHORT).show();
             }
         }
     }

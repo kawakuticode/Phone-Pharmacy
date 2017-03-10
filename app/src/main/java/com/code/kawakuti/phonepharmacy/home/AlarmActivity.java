@@ -25,6 +25,7 @@ import com.code.kawakuti.phonepharmacy.database.ExportDataBaseToFile;
 import com.code.kawakuti.phonepharmacy.models.Alarm;
 import com.code.kawakuti.phonepharmacy.models.Alarm.Day;
 import com.code.kawakuti.phonepharmacy.preferences.AlarmPreferencesAlarmActivity;
+import com.opencsv.CSVReader;
 
 import java.io.File;
 import java.io.FileReader;
@@ -32,8 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import au.com.bytecode.opencsv.CSVReader;
 
 public class AlarmActivity extends Fragment {
     ListView alarmListView;
@@ -212,6 +211,7 @@ public class AlarmActivity extends Fragment {
         @Override
         protected Long doInBackground(String... params) {
             DataBaseAlarmsHandler.init(getContext());
+            int counter = 0;
             try {
                 CSVReader reader = new CSVReader(new FileReader(file_path));
                 String[] nextLine;
@@ -251,7 +251,7 @@ public class AlarmActivity extends Fragment {
             }
             if (check > 0) {
                 updateAlarmList();
-                Toast.makeText(getContext(), "DataBase imported Successfully!" + "\n", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "alarm database backup  imported Successfully!" + "\n", Toast.LENGTH_LONG).show();
             } else {
                 updateAlarmList();
                 Toast.makeText(getContext(), "Fail to import dataBase", Toast.LENGTH_SHORT).show();
