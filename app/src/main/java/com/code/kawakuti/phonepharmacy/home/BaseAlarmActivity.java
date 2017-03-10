@@ -12,7 +12,8 @@ import android.view.ViewConfiguration;
 import android.widget.Toast;
 
 import com.code.kawakuti.phonepharmacy.R;
-import com.code.kawakuti.phonepharmacy.service.AlarmServiceBroadcastReciever;
+import com.code.kawakuti.phonepharmacy.alert.AlarmAlertBroadcastReceiver;
+
 
 import java.lang.reflect.Field;
 
@@ -82,7 +83,7 @@ public abstract class BaseAlarmActivity extends ActionBarActivity implements and
 	}
 
 	protected void callAlarmScheduleService() {
-		Intent AlarmServiceIntent = new Intent(this, AlarmServiceBroadcastReciever.class);
+		Intent AlarmServiceIntent = new Intent(this, AlarmAlertBroadcastReceiver.class);
 		sendBroadcast(AlarmServiceIntent, null);
 	}
 }

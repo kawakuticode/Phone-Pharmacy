@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.code.kawakuti.phonepharmacy.home.Med;
+import com.code.kawakuti.phonepharmacy.models.Med;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -255,8 +255,8 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
      */
     public List<Med> getAllMedsList() {
         List<Med> medsArrayList = new ArrayList<Med>();
-        String selectQuery = "SELECT  * FROM " + MED_TABLE;
 
+        String selectQuery = "SELECT  * FROM " + MED_TABLE;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
 

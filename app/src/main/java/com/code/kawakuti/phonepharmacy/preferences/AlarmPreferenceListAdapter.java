@@ -1,10 +1,16 @@
 package com.code.kawakuti.phonepharmacy.preferences;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Environment;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Process;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,29 +19,31 @@ import android.widget.BaseAdapter;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
 
-import com.code.kawakuti.phonepharmacy.home.Alarm;
+import com.code.kawakuti.phonepharmacy.models.Alarm;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlarmPreferenceListAdapter extends BaseAdapter implements Serializable {
+public class AlarmPreferenceListAdapter extends BaseAdapter implements Serializable{
 
     private Context context;
     private Alarm alarm;
     private List<AlarmPreference> preferences = new ArrayList<AlarmPreference>();
-    private final String[] repeatDays = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    private String[] repeatDays = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 
     private String[] alarmTones;
     private String[] alarmTonePaths;
+    private Cursor mCursor;
 
     public AlarmPreferenceListAdapter(Context context, Alarm alarm) {
-        setContext(context);
+
+        this.context = context;
 
         Log.d("AlarmPreferenceList", "Loading Ringtones...");
 
-        RingtoneManager ringtoneMgr = new RingtoneManager(getContext());
+        RingtoneManager ringtoneMgr = new RingtoneManager(context);
 
         ringtoneMgr.setType(RingtoneManager.TYPE_ALARM);
 
@@ -56,6 +64,11 @@ public class AlarmPreferenceListAdapter extends BaseAdapter implements Serializa
         alarmsCursor.close();
         setMyAlarm(alarm);
     }
+
+
+
+
+
 
     @Override
     public int getCount() {
@@ -78,7 +91,7 @@ public class AlarmPreferenceListAdapter extends BaseAdapter implements Serializa
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
         switch (alarmPreference.getType()) {
             case BOOLEAN:
-                if (null == convertView || convertView.getId() != android.R.layout.simple_list_item_checked)
+               // if (null == convertView || convertView.getId() != android.R.layout.simple_list_item_2)
                     convertView = layoutInflater.inflate(android.R.layout.simple_list_item_checked, null);
                 CheckedTextView checkedTextView = (CheckedTextView) convertView.findViewById(android.R.id.text1);
                 checkedTextView.setText(alarmPreference.getTitle());
@@ -90,7 +103,7 @@ public class AlarmPreferenceListAdapter extends BaseAdapter implements Serializa
             case MULTIPLE_LIST:
             case TIME:
             default:
-                if (null == convertView || convertView.getId() != android.R.layout.simple_list_item_2)
+               // if (null == convertView || convertView.getId() != android.R.layout.simple_list_item_2)
                     convertView = layoutInflater.inflate(android.R.layout.simple_list_item_2, null);
 
                 TextView text1 = (TextView) convertView.findViewById(android.R.id.text1);
@@ -170,4 +183,41 @@ public class AlarmPreferenceListAdapter extends BaseAdapter implements Serializa
         return alarmTonePaths;
     }
 
+   /* @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        dest.writeParcelable(this.alarm, flags);
+        dest.writeList(this.preferences);
+        dest.writeStringArray(this.repeatDays);
+        dest.writeStringArray(this.alarmTones);
+        dest.writeStringArray(this.alarmTonePaths);
+
+    }
+
+    protected AlarmPreferenceListAdapter(Parcel in) {
+        this.alarm = in.readParcelable(Alarm.class.getClassLoader());
+        this.preferences = new ArrayList<AlarmPreference>();
+        in.readList(this.preferences, AlarmPreference.class.getClassLoader());
+        this.repeatDays = in.createStringArray();
+        this.alarmTones = in.createStringArray();
+        this.alarmTonePaths = in.createStringArray();
+        this.mCursor = in.readParcelable(Cursor.class.getClassLoader());
+    }
+
+    public static final Creator<AlarmPreferenceListAdapter> CREATOR = new Creator<AlarmPreferenceListAdapter>() {
+        @Override
+        public AlarmPreferenceListAdapter createFromParcel(Parcel source) {
+            return new AlarmPreferenceListAdapter(source);
+        }
+
+        @Override
+        public AlarmPreferenceListAdapter[] newArray(int size) {
+            return new AlarmPreferenceListAdapter[size];
+        }
+    };*/
 }

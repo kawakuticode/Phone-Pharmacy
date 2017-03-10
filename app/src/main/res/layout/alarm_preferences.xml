@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:background="@drawable/rounded_button"
+            android:background="@drawable/button_background"
             android:shadowColor="#7fa07bfc"
             android:shadowDx="4"
             android:shadowDy="-4"
@@ -51,7 +51,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginBottom="4dp"
             android:textStyle="bold"
-            android:background="@drawable/rounded_button"
+            android:background="@drawable/button_background"
             android:shadowColor="#7fa07bfc"
             android:shadowDx="4"
             android:shadowDy="-4" />

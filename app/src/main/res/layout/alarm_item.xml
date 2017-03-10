@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="2dp"
+    card_view:cardCornerRadius="4dp">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!--  ListRow Left sied Thumbnail image -->
+        <FrameLayout
+            android:id="@+id/med_img_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:foreground="@drawable/border"
+            android:foregroundGravity="center"
+            android:padding="16dp"
+
+            >
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/alarm_img"
+                android:layout_width="80dip"
+                android:layout_height="80dip"
+                android:src="@mipmap/ic_alarm_off" />
+        </FrameLayout>
+
+
+        <CheckBox
+                android:id="@+id/checkBox_alarm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:buttonTint="#4871ec"
+                android:focusable="false" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/med_img_layout"
+            android:orientation="vertical"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp">
+
+
+            <TextView
+                android:id="@+id/text_medicine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:text="cloroquina"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView_alarm_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:text="alarme time"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/textView_alarm_days"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:text="monday , tuesday , wednesday"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

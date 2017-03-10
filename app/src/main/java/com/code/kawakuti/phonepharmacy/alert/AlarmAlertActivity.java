@@ -11,7 +11,6 @@ import android.os.Vibrator;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -21,7 +20,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.code.kawakuti.phonepharmacy.R;
-import com.code.kawakuti.phonepharmacy.home.Alarm;
+import com.code.kawakuti.phonepharmacy.models.Alarm;
 
 
 public class AlarmAlertActivity extends Activity implements OnClickListener {
@@ -45,20 +44,14 @@ public class AlarmAlertActivity extends Activity implements OnClickListener {
                 | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.takemedicealarm);
 
-
-
-        Bundle bundle = this.getIntent().getExtras();
-        alarm = (Alarm) bundle.getSerializable("alarm");
-
+        this.alarm = (Alarm) getIntent().getExtras().getSerializable("alarm");
         textSchedule = (TextView) findViewById(R.id.scheduleTime);
         textSchedule.startAnimation(AnimationUtils.makeInAnimation(this, true));
         textMedicine = (TextView) findViewById(R.id.medicine_take);
         textMedicine.setText(alarm.getAlarmName());
         textMedicine.startAnimation(AnimationUtils.makeInAnimation(this, true));
-
         stopAlarm = (Button) findViewById(R.id.button_stop_alarm);
         stopAlarm.setOnClickListener(this);
-
 
 
         TelephonyManager telephonyManager = (TelephonyManager) this
@@ -93,8 +86,8 @@ public class AlarmAlertActivity extends Activity implements OnClickListener {
         telephonyManager.listen(phoneStateListener,
                 PhoneStateListener.LISTEN_CALL_STATE);
         startAlarm();
-
     }
+
 
     @Override
     protected void onResume() {
@@ -152,48 +145,32 @@ public class AlarmAlertActivity extends Activity implements OnClickListener {
 
     @Override
     protected void onDestroy() {
-        try {
-            if (vibrator != null)
-                vibrator.cancel();
-        } catch (Exception e) {
-
-        }
-        try {
-            mediaPlayer.stop();
-        } catch (Exception e) {
-
-        }
-        try {
-            mediaPlayer.release();
-            this.onDestroy();
-        } catch (Exception e) {
-
-        }
         super.onDestroy();
     }
 
     @Override
     public void onClick(View v) {
+
+
         if (!alarmActive)
             return;
-        String button = (String) v.getTag();
-        v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
-        if (v.getId()  == stopAlarm.getId() ) {
 
+        if (v.getId()  == stopAlarm.getId() ) {
             alarmActive = false;
+
             if (vibrator != null)
                 vibrator.cancel();
+
             try {
+
                 mediaPlayer.stop();
-            } catch (IllegalStateException ise) {
-
-            }
-            try {
                 mediaPlayer.release();
-            } catch (Exception e) {
 
+
+            } catch (IllegalStateException ise) {
+                ise.printStackTrace();
             }
-            finish();
+            this.finish();
 
         }
 

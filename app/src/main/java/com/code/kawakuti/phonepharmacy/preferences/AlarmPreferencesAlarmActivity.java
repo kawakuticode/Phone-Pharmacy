@@ -1,5 +1,6 @@
 package com.code.kawakuti.phonepharmacy.preferences;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
@@ -14,9 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
-import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.design.widget.Snackbar;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,17 +27,16 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.code.kawakuti.phonepharmacy.R;
 import com.code.kawakuti.phonepharmacy.database.DataBaseAlarmsHandler;
-import com.code.kawakuti.phonepharmacy.home.Alarm;
-import com.code.kawakuti.phonepharmacy.service.AlarmServiceBroadcastReciever;
+import com.code.kawakuti.phonepharmacy.models.Alarm;
+import com.code.kawakuti.phonepharmacy.service.AlarmServiceBroadcastReceiver;
 
 import java.util.Calendar;
 
 
-public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements View.OnClickListener {
+public class AlarmPreferencesAlarmActivity extends Activity implements View.OnClickListener {
 
     private Alarm alarm;
     private MediaPlayer mediaPlayer;
@@ -62,24 +60,21 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey("alarm")) {
+            //setMyAlarm((Alarm) bundle.getSerializable("alarm"));
             setMyAlarm((Alarm) bundle.getSerializable("alarm"));
             input.setText(getMyAlarm().getAlarmName().toString());
-            System.out.println("NAME ----> " +  input.getText().toString());
 
         } else {
             setMyAlarm(new Alarm());
+            //setListAdapter(new AlarmPreferenceListAdapter(this, getMyAlarm()));
+
         }
         if (bundle != null && bundle.containsKey("adapter")) {
             setListAdapter((AlarmPreferenceListAdapter) bundle.getSerializable("adapter"));
         } else {
             setListAdapter(new AlarmPreferenceListAdapter(this, getMyAlarm()));
+
         }
-
-       /*
-        if(input.getParent()!=null)
-            ((ViewGroup)input.getParent()).removeView(input); // <- fix
-        alert.setView(input);*/
-
         getListView().setOnItemClickListener(new OnItemClickListener() {
 
             @Override
@@ -285,6 +280,7 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+
         outState.putSerializable("alarm", getMyAlarm());
         outState.putSerializable("adapter", (AlarmPreferenceListAdapter) getListAdapter());
     }
@@ -292,7 +288,7 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        alarm = (Alarm) savedInstanceState.getSerializable("alarm");
+        this.alarm = (Alarm) savedInstanceState.getSerializable("alarm");
 
     }
 
@@ -312,7 +308,7 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
     }
 
     public Alarm getMyAlarm() {
-        return alarm;
+        return this.alarm;
     }
 
     public void setMyAlarm(Alarm alarm) {
@@ -342,59 +338,39 @@ public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements 
     public void submitAlarm() {
 
         DataBaseAlarmsHandler.init(getApplicationContext());
+
+        //DataBaseAlarmsHandler dbHandler = new DataBaseAlarmsHandler(getApplicationContext());
+        // dbHandler.init(getApplicationContext());
+
         if (getMyAlarm().getId() < 1) {
             DataBaseAlarmsHandler.create(alarm);
         } else {
-            DataBaseAlarmsHandler.update(alarm);
-            callAlarmScheduleService();
+            if (DataBaseAlarmsHandler.update(alarm) != 0) {
+                callAlarmScheduleService();
+                finishAfterTransition();
+            }
         }
-        finish();
     }
 
     public void callAlarmScheduleService() {
-        Intent AlarmServiceIntent = new Intent(this, AlarmServiceBroadcastReciever.class);
-        sendBroadcast(AlarmServiceIntent, null);
+        sendBroadcast(new Intent(this, AlarmServiceBroadcastReceiver.class), null);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.add_alarm:
+
                 if (validateAlarmName(input)) {
                     submitAlarm();
-                    finish();
+
                 } else if (!validateAlarmName(input)) {
-                    Toast.makeText(AlarmPreferencesAlarmActivity.this, "Add Name of Medicine to Take", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(v, "Input name of medicine to take ", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
             case R.id.cancel_alarm:
                 finish();
         }
-    }
-
-    private class MyTextWatcher implements TextWatcher {
-
-        private EditText txt;
-
-        public MyTextWatcher(EditText view) {
-            this.txt = view;
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            validateAlarmName(txt);
-        }
-
     }
 
 

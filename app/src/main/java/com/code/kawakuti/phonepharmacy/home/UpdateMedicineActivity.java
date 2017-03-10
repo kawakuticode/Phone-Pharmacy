@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.code.kawakuti.phonepharmacy.R;
 import com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler;
+import com.code.kawakuti.phonepharmacy.models.Med;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -64,7 +65,7 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey("medicine")) {
-            setMed((Med) bundle.getSerializable("medicine"));
+            setMed((Med) bundle.getParcelable("medicine"));
         }
 
         initCalendar();
@@ -132,8 +133,9 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
             getMed().setName(updt_name.getText().toString());
             getMed().setDescription(updt_desc.getText().toString());
             getMed().setExpireDate(mCalendar.getTime());
-            getMed().setSrcImage(img_source.toString());
-
+            if (getMed().getSrcImage() == null) {
+                getMed().setSrcImage("");
+            }
             db.updateEntry(getMed());
             db.close();
             Toast.makeText(this, "Updated with Sucess", Toast.LENGTH_SHORT).show();
@@ -210,11 +212,13 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
 
     }
 
-
     public String changeButtonTextToPath(String path) {
-
-        return !path.isEmpty() ? splitedPath(path)[splitedPath(path).length - 1] : "select photo";
-
+        String result = "";
+        if (path != null)
+            result = !path.isEmpty() ? splitedPath(path)[splitedPath(path).length - 1] : " photo " ;
+        else
+            result = " photo ";
+        return result;
     }
 
     public String[] splitedPath(String input) {
@@ -268,7 +272,7 @@ public class UpdateMedicineActivity extends AppCompatActivity implements View.On
 
         outState.putParcelable("file_uri", fileUri);
         outState.putSerializable("calendar_state", mCalendar);
-        outState.putSerializable("medicine", getMed());
+        outState.putParcelable("medicine", getMed());
     }
 
     @Override

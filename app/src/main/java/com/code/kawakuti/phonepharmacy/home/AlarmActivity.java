@@ -1,102 +1,70 @@
 package com.code.kawakuti.phonepharmacy.home;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
+
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.code.kawakuti.phonepharmacy.R;
+import com.code.kawakuti.phonepharmacy.adapters.AlarmAdapter;
 import com.code.kawakuti.phonepharmacy.database.DataBaseAlarmsHandler;
 import com.code.kawakuti.phonepharmacy.database.ExportDataBaseToFile;
-import com.code.kawakuti.phonepharmacy.home.Alarm.Day;
+import com.code.kawakuti.phonepharmacy.models.Alarm;
+import com.code.kawakuti.phonepharmacy.models.Alarm.Day;
 import com.code.kawakuti.phonepharmacy.preferences.AlarmPreferencesAlarmActivity;
-import com.code.kawakuti.phonepharmacy.service.AlarmServiceBroadcastReciever;
+
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-public class AlarmActivity extends Fragment implements View.OnClickListener {
+public class AlarmActivity extends Fragment {
     ListView alarmListView;
-    AlarmListAdapter alarmListAdapter;
     View rootView;
-    private DataBaseAlarmsHandler db;
+    private DataBaseAlarmsHandler db_alarms;
     private String file_name = "alarm_data_base_back_up.csv";
     private String import_file_path = "/PhoneParmacy/alarm_data_base_back_up.csv";
-
+    private List<Alarm> alarmList = new ArrayList<>();
+    AlarmAdapter alarmAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.alarm_activity, container, false);
-        alarmListView = (ListView) rootView.findViewById(android.R.id.list);
-        alarmListView.setLongClickable(true);
+
+        rootView = inflater.inflate(R.layout.alarm_card, container, false);
+        DataBaseAlarmsHandler.init(getContext());
+        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.cardview_alarm);
+        recyclerView.setHasFixedSize(true);
         setHasOptionsMenu(true);
-        alarmListView.setOnItemLongClickListener(new OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-                //view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                final Alarm alarm = (Alarm) alarmListAdapter.getItem(position);
-                Builder dialog = new AlertDialog.Builder(getContext());
-                dialog.setTitle("Delete");
-                dialog.setMessage("Delete this alarm?");
-                dialog.setPositiveButton("Ok", new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        DataBaseAlarmsHandler.init(getContext());
-                        DataBaseAlarmsHandler.deleteEntry(alarm);
-                        AlarmActivity.this.callAlarmScheduleService();
-                        DataBaseAlarmsHandler.deactivate();
-                        updateAlarmList();
-                    }
-                });
-                dialog.setNegativeButton("Cancel", new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
-                return true;
-            }
-        });
-        callAlarmScheduleService();
-        alarmListAdapter = new AlarmListAdapter(this);
-        this.alarmListView.setAdapter(alarmListAdapter);
-        alarmListView.setOnItemClickListener(new OnItemClickListener() {
 
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View v, int position, long id) {
-                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
-                Alarm alarm = (Alarm) alarmListAdapter.getItem(position);
-                Intent intent = new Intent(getContext(), AlarmPreferencesAlarmActivity.class);
-                intent.putExtra("alarm", alarm);
-                startActivity(intent);
-            }
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
-        });
+        db_alarms = new DataBaseAlarmsHandler(this.getContext());
+
+        alarmList = db_alarms.getAllAlarms();
+
+
+        alarmAdapter = new AlarmAdapter(this, alarmList, this.getContext());
+        recyclerView.setAdapter(alarmAdapter);
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,9 +79,9 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
 
     @Override
     public void onPause() {
-        // setListAdapter(null);
         DataBaseAlarmsHandler.deactivate();
         super.onPause();
+
     }
 
     @Override
@@ -124,42 +92,13 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
 
     public void updateAlarmList() {
         DataBaseAlarmsHandler.init(getContext());
-        final List<Alarm> alarms = DataBaseAlarmsHandler.getAll();
-        alarmListAdapter.setMathAlarms(alarms);
-        DataBaseAlarmsHandler.deactivate();
-        getActivity().runOnUiThread(new Runnable() {
-            public void run() {
-                // reload content
-                AlarmActivity.this.alarmListAdapter.notifyDataSetChanged();
-                if (alarms.size() > 0) {
-                    rootView.findViewById(android.R.id.empty).setVisibility(View.INVISIBLE);
-                } else {
-                    rootView.findViewById(android.R.id.empty).setVisibility(View.VISIBLE);
-                }
+        final List<Alarm> alarms = DataBaseAlarmsHandler.getAllAlarms();
+        alarmAdapter.setAlarms(alarms);
+        alarmAdapter.notifyDataSetChanged();
+        db_alarms.close();
             }
-        });
-    }
 
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.checkBox_alarm_active) {
-            CheckBox checkBox = (CheckBox) v;
-            Alarm alarm = (Alarm) alarmListAdapter.getItem((Integer) checkBox.getTag());
-            alarm.setAlarmActive(checkBox.isChecked());
-            DataBaseAlarmsHandler.init(getContext());
-            DataBaseAlarmsHandler.update(alarm);
-            AlarmActivity.this.callAlarmScheduleService();
-            DataBaseAlarmsHandler.deactivate();
-            if (checkBox.isChecked()) {
-                Toast.makeText(getContext(), alarm.getTimeUntilNextAlarmMessage(), Toast.LENGTH_LONG).show();
-            }
-        }
-    }
 
-    protected void callAlarmScheduleService() {
-        Intent alarmServiceIntent = new Intent(getContext(), AlarmServiceBroadcastReciever.class);
-        getContext().sendBroadcast(alarmServiceIntent, null);
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -172,8 +111,8 @@ public class AlarmActivity extends Fragment implements View.OnClickListener {
         switch (item.getItemId()) {
             case R.id.menu_item_export:
                 Log.d("DaTABASE TABLE ", DataBaseAlarmsHandler.ALARM_TABLE);
-                db = new DataBaseAlarmsHandler(getContext());
-                new ExportDataBaseToFile(getContext(), db, file_name, DataBaseAlarmsHandler.ALARM_TABLE).execute();
+        db_alarms=new DataBaseAlarmsHandler(getContext());
+        new ExportDataBaseToFile(getContext(),db_alarms,file_name,DataBaseAlarmsHandler.ALARM_TABLE).execute();
                 break;
             case R.id.menu_item_import:
                 String path = getImport_file_path(import_file_path);

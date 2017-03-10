@@ -18,8 +18,6 @@ public class BroadCastAlarm extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String message = intent.getStringExtra("medicine");
-        /*TakeMedicineAlarm.getTextTimeView().setText("Enough Rest. Do Work Now!");
-       TakeMedicineAlarm.getTextMedicine().setText("Enough Rest. Do Work Now!");*/
 
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         Ringtone ringtone = RingtoneManager.getRingtone(context, uri);

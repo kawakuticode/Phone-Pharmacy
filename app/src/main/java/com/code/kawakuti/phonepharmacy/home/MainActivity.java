@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.code.kawakuti.phonepharmacy.R;
+import com.code.kawakuti.phonepharmacy.adapters.MyPageAdapter;
 
 public class MainActivity extends AppCompatActivity{
 

@@ -5,8 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
-import com.code.kawakuti.phonepharmacy.home.Alarm;
+import com.code.kawakuti.phonepharmacy.models.Alarm;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,7 +24,7 @@ import java.util.List;
  */
 public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 
-	static DataBaseAlarmsHandler instance = null;
+	static DataBaseAlarmsHandler instance = null ;
 
 	static SQLiteDatabase database = null;
 	
@@ -38,6 +39,8 @@ public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 	public static final String COLUMN_ALARM_TONE = "alarm_tone";
 	public static final String COLUMN_ALARM_VIBRATE = "alarm_vibrate";
 	public static final String COLUMN_ALARM_NAME = "alarm_name";
+
+	
 
 	public enum AlarmColumns {
 		TABLE_ALARM,
@@ -60,7 +63,6 @@ public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 					return "alarm_active";
 				case ALARM_TIME:
 					return "alarm_time";
-
 				case ALARM_DAYS:
 					return "alarm_days";
 				case ALARM_TONE:
@@ -116,22 +118,26 @@ public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 		cv.put(COLUMN_ALARM_NAME, alarm.getAlarmName());
 		return getDatabase().insert(ALARM_TABLE, null, cv);
 	}
+
 	public static int update(Alarm alarm) {
 		ContentValues cv = new ContentValues();
 		cv.put(COLUMN_ALARM_ACTIVE, alarm.getAlarmActive());
 		cv.put(COLUMN_ALARM_TIME, alarm.getAlarmTimeString());
 		
 		try {
+
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		    ObjectOutputStream oos = null;
 		    oos = new ObjectOutputStream(bos);
-		    oos.writeObject(alarm.getDays());
+			Log.d("Ooss " , oos.toString()) ;
+			oos.writeObject(alarm.getDays());
 		    byte[] buff = bos.toByteArray();
-		    
 		    cv.put(COLUMN_ALARM_DAYS, buff);
 		    
 		} catch (Exception e){
-		}		
+
+			e.printStackTrace();
+		}
 
 		cv.put(COLUMN_ALARM_TONE, alarm.getAlarmTonePath());
 		cv.put(COLUMN_ALARM_VIBRATE, alarm.getVibrate());
@@ -235,7 +241,7 @@ public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
-	public static List <Alarm> getAll() {
+	public static List <Alarm> getAllAlarms() {
 		List<Alarm> alarms = new ArrayList<Alarm>();
 		Cursor cursor = DataBaseAlarmsHandler.getCursor();
 		if (cursor.moveToFirst()) {

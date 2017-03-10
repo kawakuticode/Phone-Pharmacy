@@ -3,6 +3,10 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-
+    <color name="medicinecolor">#ced5d8d9</color>
     <color name="black_overlay">#66000000</color>
-</resources>
+        <color name="button_pressed">#ffffff</color>
+        <color name="button_focused">#a3beff</color>
+        <color name="button_default">#1686e9</color>
+    </resources>
+

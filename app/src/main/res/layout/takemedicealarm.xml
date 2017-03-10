@@ -27,7 +27,8 @@
         android:shadowDy="-4"
         android:padding="15dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="47dp" />
 
     <TextClock
         android:id="@+id/time_content"

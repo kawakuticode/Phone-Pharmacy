@@ -9,8 +9,11 @@ import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.code.kawakuti.phonepharmacy.utilis.PharmacyHelper;
 
 import java.io.StringWriter;
 
@@ -20,10 +23,16 @@ import java.io.StringWriter;
 public class MyLocationTrack implements LocationListener {
     private static final String TAG = "LOCATIONTRACK";
     private Context myContext;
+
+    public LocationManager getmLocationManager() {
+        return mLocationManager;
+    }
+
     private LocationManager mLocationManager;
     private StringWriter output;
 
 
+    private static final int COARSE_PERMISSION_REQUEST_CODE = 0;
     private static long LOCATION_VALIDITY_DURATION_MS = 2 * 60 * 1000; // 2 min
     Location result;
 
@@ -33,45 +42,28 @@ public class MyLocationTrack implements LocationListener {
         output = new StringWriter();
 
     }
-
-    public boolean isGpsLocationProviderEnabled() {
-        try {
-            return mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
-        }
-        return false;
-    }
-
-    public boolean isNetworkLocationProviderEnabled() {
-        try {
-            return mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
-        }
-        return false;
-    }
     /**
      * Start retrieving location, caching it for a few minutes.
      */
     public Location startRetrievingLocation() {
         Location location = getLastKnownLocation();
+
         // If the last known location is recent enough, just return it, else request location updates
         if (location != null && (System.currentTimeMillis() - location.getTime()) <= LOCATION_VALIDITY_DURATION_MS) {
                 result = location;
         } else {
             // Don't start listeners if no provider is enabled
-            if (!isGpsLocationProviderEnabled() && !isNetworkLocationProviderEnabled()) {
+            if (!PharmacyHelper.isGpsLocationProviderEnabled(getmLocationManager()) && !PharmacyHelper.isNetworkLocationProviderEnabled(getmLocationManager())) {
                     Log.d(TAG, "UNABLE TO LOCATE ");
                 }
             }
-            if (isGpsLocationProviderEnabled()) {
+        if (PharmacyHelper.isGpsLocationProviderEnabled(getmLocationManager())) {
                 if (ActivityCompat.checkSelfPermission(myContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(myContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
                 }
             }
-            if (isNetworkLocationProviderEnabled()) {
+        if (PharmacyHelper.isNetworkLocationProviderEnabled(getmLocationManager())) {
                 mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
             }
     return result;
@@ -88,6 +80,8 @@ public class MyLocationTrack implements LocationListener {
         this.mLocationManager.removeUpdates(this);
     }
 
+
+
     /**
      * Get last known location even if this location is old.
      */
@@ -101,10 +95,10 @@ public class MyLocationTrack implements LocationListener {
         if (ActivityCompat.checkSelfPermission(myContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(myContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            if (isGpsLocationProviderEnabled()) {
+            if (PharmacyHelper.isGpsLocationProviderEnabled(getmLocationManager())) {
                 gpsLoc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             }
-            if (isNetworkLocationProviderEnabled()) {
+            if (PharmacyHelper.isNetworkLocationProviderEnabled(getmLocationManager())) {
                     netLoc = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }
 
@@ -125,10 +119,10 @@ public class MyLocationTrack implements LocationListener {
             }
 
         }
-        if (isGpsLocationProviderEnabled()) {
+        if (PharmacyHelper.isGpsLocationProviderEnabled(getmLocationManager())) {
             gpsLoc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         }
-        if (isNetworkLocationProviderEnabled()) {
+        if (PharmacyHelper.isNetworkLocationProviderEnabled(getmLocationManager())) {
             netLoc = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         }
 
@@ -152,82 +146,6 @@ public class MyLocationTrack implements LocationListener {
     }
 
 
-
-
-   /* */
-
-    /**
-     * Get address from location
-     *//*
-    public static String getReverseGeocodedAddress(Context context, Location location) {
-        String addrStr = "";
-
-        Geocoder geocoder = new Geocoder(context);
-        try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-            StringBuilder addressStrBuilder = new StringBuilder();
-            if (addresses != null && addresses.size() > 0) {
-                Address address = addresses.get(0);
-                for (int i = 0; i < address.getMaxAddressLineIndex() && i < 1; i++) {
-                    addressStrBuilder.append(address.getAddressLine(i) + " ");
-                }
-                addrStr = addressStrBuilder.toString();
-            }
-        } catch (IOException e) {
-            Log.w(TAG, "Unable to retrieve reverse geocoded address.", e);
-        }
-        return addrStr;
-    }
-
-    public static String getReverseGeocodedApproxArea(Context context, Location location) {
-        return getReverseGeocodedApproxArea(context, location.getLongitude(), location.getLatitude());
-    }
-
-    public static String getReverseGeocodedApproxArea(Context context, double longitude, double latitude) {
-        String area = null;
-
-        Geocoder geocoder = new Geocoder(context);
-        try {
-            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 3);
-            int numAddresses = addresses.size();
-            for (int i = 0; i < numAddresses; i++) {
-                Address address = addresses.get(i);
-
-                if (area == null) {
-                    area = address.getSubLocality();
-                }
-                if (area == null) {
-                    area = address.getLocality();
-                }
-                if (area == null) {
-                    area = address.getSubAdminArea();
-                }
-                if (area == null) {
-                    area = address.getAdminArea();
-                }
-
-                if (area != null) {
-                    return area;
-                }
-            }
-        } catch (IOException e) {
-            Log.w(TAG, "Unable to retrieve reverse geocoded address.", e);
-        }
-        return "";
-    }
-
-*/
-
-
-
-    private void printLocation(Location location) {
-        if (location != null) {
-            System.out.println(location.toString());
-        } else {
-            System.out.println("\nLocation[unknown]\n\n");
-        }
-    }
-
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         output.append("\n\nProvider Status Changed: " + provider + ", Status=" + status + ", Extras=" + extras);
@@ -236,20 +154,17 @@ public class MyLocationTrack implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-
         // Retrieving Latitude
         location.getLatitude();
         location.getLongitude();
 
-        String text = "My Current Location is:\nLatitude = "
+/*        String text = "My Current Location is:\nLatitude = "
                 + location.getLatitude() + "\nLongitude = "
                 + location.getLongitude();
         output.append(text);
         Toast.makeText(myContext, text, Toast.LENGTH_SHORT)
-                .show();
-
+                .show()*/;
     }
-
 
     @Override
     public void onProviderEnabled(String provider) {
@@ -259,17 +174,12 @@ public class MyLocationTrack implements LocationListener {
 
     @Override
     public void onProviderDisabled(String provider) {
-        Toast.makeText(myContext, "provider  disable  " + provider.toString(),
-                Toast.LENGTH_SHORT).show();
+        Toast.makeText(myContext, "provider  disable  " + provider.toString(), Toast.LENGTH_SHORT).show();
         if (ActivityCompat.checkSelfPermission(myContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(myContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
         }
         mLocationManager.removeUpdates(this);
 
-    }
-    public void turnGPSWifi() {
-        WifiManager wifiManager = (WifiManager) myContext.getSystemService(Context.WIFI_SERVICE);
-        wifiManager.setWifiEnabled(true);
     }
 }

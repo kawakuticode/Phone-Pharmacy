@@ -6,9 +6,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 
 import com.code.kawakuti.phonepharmacy.R;
 import com.code.kawakuti.phonepharmacy.database.DataBaseMedsHandler;
+import com.code.kawakuti.phonepharmacy.models.Med;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -118,7 +121,6 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
 
     private void submitForm() {
         if (validateMedName()) {
-
             Med tmp = new Med();
             tmp.setName(medicine_name.getText().toString());
             tmp.setDescription(medicine_descr.getText().toString());
@@ -250,6 +252,7 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
         super.onPause();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
