@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.code.kawakuti.phonepharmacy.models.Alarm;
 
@@ -24,56 +23,22 @@ import java.util.List;
  */
 public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 
-	static DataBaseAlarmsHandler instance = null ;
-
-	static SQLiteDatabase database = null;
-	
-	static final String DATABASE_NAME = "AlarmsDataBase";
-	static final int DATABASE_VERSION = 1;
-	
 	public static final String ALARM_TABLE = "alarm";
 	public static final String COLUMN_ALARM_ID = "_id";
-	public static final String COLUMN_ALARM_ACTIVE = "alarm_active";	
+	public static final String COLUMN_ALARM_ACTIVE = "alarm_active";
 	public static final String COLUMN_ALARM_TIME = "alarm_time";
 	public static final String COLUMN_ALARM_DAYS = "alarm_days";
 	public static final String COLUMN_ALARM_TONE = "alarm_tone";
 	public static final String COLUMN_ALARM_VIBRATE = "alarm_vibrate";
 	public static final String COLUMN_ALARM_NAME = "alarm_name";
+	static final String DATABASE_NAME = "AlarmsDataBase";
+	static final int DATABASE_VERSION = 1;
+	static DataBaseAlarmsHandler instance = null;
+	static SQLiteDatabase database = null;
 
-	
 
-	public enum AlarmColumns {
-		TABLE_ALARM,
-		ALARM_ID,
-		ALARM_ACTIVE,
-		ALARM_TIME,
-		ALARM_DAYS,
-		ALARM_TONE,
-		ALARM_VIBRATE,
-		ALARM_NAME;
-
-		@Override
-		public String toString() {
-			switch (this) {
-				case TABLE_ALARM:
-					return "alarm";
-				case ALARM_ID:
-					return "_id";
-				case ALARM_ACTIVE:
-					return "alarm_active";
-				case ALARM_TIME:
-					return "alarm_time";
-				case ALARM_DAYS:
-					return "alarm_days";
-				case ALARM_TONE:
-					return "alarm_tone";
-				case ALARM_VIBRATE:
-					return "alarm_vibrate";
-				case ALARM_NAME:
-					return "alarm_name";
-			}
-			return super.toString();
-		}
+	public DataBaseAlarmsHandler(Context context) {
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
 	public static void init(Context context) {
@@ -104,14 +69,14 @@ public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 		
 		try {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		    ObjectOutputStream oos = null;
-		    oos = new ObjectOutputStream(bos);
-		    oos.writeObject(alarm.getDays());
-		    byte[] buff = bos.toByteArray();
+			ObjectOutputStream oos = new ObjectOutputStream(bos);
+			oos.writeObject(alarm.getDays());
+			byte[] buff = bos.toByteArray();
 		    
 		    cv.put(COLUMN_ALARM_DAYS, buff);
 		    
 		} catch (Exception e){
+			e.printStackTrace();
 		}
 		cv.put(COLUMN_ALARM_TONE, alarm.getAlarmTonePath());
 		cv.put(COLUMN_ALARM_VIBRATE, alarm.getVibrate());
@@ -127,9 +92,7 @@ public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 		try {
 
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		    ObjectOutputStream oos = null;
-		    oos = new ObjectOutputStream(bos);
-			Log.d("Ooss " , oos.toString()) ;
+			ObjectOutputStream oos = new ObjectOutputStream(bos);
 			oos.writeObject(alarm.getDays());
 		    byte[] buff = bos.toByteArray();
 		    cv.put(COLUMN_ALARM_DAYS, buff);
@@ -218,29 +181,6 @@ public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 				null);
 	}
 
-	 public DataBaseAlarmsHandler(Context context) {
-		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-	}
-
-	@Override
-	public void onCreate(SQLiteDatabase db) {
-		// TODO Auto-generated method stub
-		db.execSQL("CREATE TABLE IF NOT EXISTS " + ALARM_TABLE + " ( " 
-				+ COLUMN_ALARM_ID + " INTEGER primary key autoincrement, " 
-				+ COLUMN_ALARM_ACTIVE + " INTEGER NOT NULL, " 
-				+ COLUMN_ALARM_TIME + " TEXT NOT NULL, " 
-				+ COLUMN_ALARM_DAYS + " BLOB NOT NULL, "
-				+ COLUMN_ALARM_TONE + " TEXT NOT NULL, " 
-				+ COLUMN_ALARM_VIBRATE + " INTEGER NOT NULL, " 
-				+ COLUMN_ALARM_NAME + " TEXT NOT NULL)");
-	}
-
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		db.execSQL("DROP TABLE IF EXISTS " + ALARM_TABLE);
-		onCreate(db);
-	}
-
 	public static List <Alarm> getAllAlarms() {
 		List<Alarm> alarms = new ArrayList<Alarm>();
 		Cursor cursor = DataBaseAlarmsHandler.getCursor();
@@ -277,9 +217,62 @@ public class DataBaseAlarmsHandler extends SQLiteOpenHelper {
 				alarm.setAlarmName(cursor.getString(6));
 				alarms.add(alarm);
 
-			} while (cursor.moveToNext());			
+			} while (cursor.moveToNext());
 		}
 		cursor.close();
 		return alarms;
+	}
+
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		// TODO Auto-generated method stub
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + ALARM_TABLE + " ( "
+				+ COLUMN_ALARM_ID + " INTEGER primary key autoincrement, "
+				+ COLUMN_ALARM_ACTIVE + " INTEGER NOT NULL, "
+				+ COLUMN_ALARM_TIME + " TEXT NOT NULL, "
+				+ COLUMN_ALARM_DAYS + " BLOB NOT NULL, "
+				+ COLUMN_ALARM_TONE + " TEXT NOT NULL, "
+				+ COLUMN_ALARM_VIBRATE + " INTEGER NOT NULL, "
+				+ COLUMN_ALARM_NAME + " TEXT NOT NULL)");
+	}
+
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		db.execSQL("DROP TABLE IF EXISTS " + ALARM_TABLE);
+		onCreate(db);
+	}
+
+	public enum AlarmColumns {
+		TABLE_ALARM,
+		ALARM_ID,
+		ALARM_ACTIVE,
+		ALARM_TIME,
+		ALARM_DAYS,
+		ALARM_TONE,
+		ALARM_VIBRATE,
+		ALARM_NAME;
+
+		@Override
+		public String toString() {
+			switch (this) {
+				case TABLE_ALARM:
+					return "alarm";
+				case ALARM_ID:
+					return "_id";
+				case ALARM_ACTIVE:
+					return "alarm_active";
+				case ALARM_TIME:
+					return "alarm_time";
+				case ALARM_DAYS:
+					return "alarm_days";
+				case ALARM_TONE:
+					return "alarm_tone";
+				case ALARM_VIBRATE:
+					return "alarm_vibrate";
+				case ALARM_NAME:
+					return "alarm_name";
+			}
+			return super.toString();
+		}
 	}
 }

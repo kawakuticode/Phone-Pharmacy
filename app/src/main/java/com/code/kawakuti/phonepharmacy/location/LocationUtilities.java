@@ -27,6 +27,11 @@ public class LocationUtilities {
         this.mActivity = activity;
     }
 
+    public static void turnGPSWifi(Context mContext) {
+        WifiManager wifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager.setWifiEnabled(true);
+    }
+
     public Context getmContext() {
         return mContext;
     }
@@ -68,11 +73,6 @@ public class LocationUtilities {
         dialog.show();
     }
 
-
-    public static void turnGPSWifi(Context mContext) {
-        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-        wifiManager.setWifiEnabled(true);
-    }
 
 
 }

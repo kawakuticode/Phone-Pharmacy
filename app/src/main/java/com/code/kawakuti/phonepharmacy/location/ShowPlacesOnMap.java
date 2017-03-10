@@ -7,8 +7,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,7 +27,7 @@ import java.util.ArrayList;
 /**
  * Created by Russelius on 01/02/16.
  */
-public class ShowPlacesOnMap extends ActionBarActivity implements LocationListener {
+public class ShowPlacesOnMap extends AppCompatActivity implements LocationListener {
 
     private GoogleMap mMap;
     private String type_of_place;
@@ -162,10 +161,10 @@ public class ShowPlacesOnMap extends ActionBarActivity implements LocationListen
     }
 
     private class SyncGetPlaces extends AsyncTask<ArrayList<Place>, Integer, ArrayList<Place>> {
+        ArrayList<Place> findPlaces = new ArrayList<>();
         private ProgressDialog dialog;
         private Context context;
         private String type_of_place;
-        ArrayList<Place> findPlaces = new ArrayList<>();
 
         public SyncGetPlaces(Context c, String type) {
             this.context = c;
@@ -210,7 +209,7 @@ public class ShowPlacesOnMap extends ActionBarActivity implements LocationListen
                             .position(
                                     new LatLng(places.get(i).getLatitude(), places
                                             .get(i).getLongitude())));
-                    Log.e("FIND", "places-->  : " + places.get(i).getName());
+                    //Log.e("FIND", "places-->  : " + places.get(i).getName());
 
                 }
                 CameraPosition cameraPosition = new CameraPosition.Builder()

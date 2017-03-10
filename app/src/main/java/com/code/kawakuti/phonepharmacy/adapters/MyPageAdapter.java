@@ -17,7 +17,7 @@ public class MyPageAdapter extends FragmentPagerAdapter {
 
 
     Context mContext;
-    String[] pages = {"Medicines", "Memo Recips", "Find Pharmacy", "Find Hospital"};
+    String[] pages = {"Medicines", "Take Pills", "Find Pharmacy", "Find Hospital"};
 
     public MyPageAdapter(FragmentManager fm, Context context) {
         super(fm);

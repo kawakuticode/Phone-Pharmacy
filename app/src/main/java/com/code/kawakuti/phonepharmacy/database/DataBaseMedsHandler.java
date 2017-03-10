@@ -17,48 +17,14 @@ import java.util.List;
  */
 public class DataBaseMedsHandler extends SQLiteOpenHelper {
 
-    static DataBaseMedsHandler instance = null;
-    static SQLiteDatabase database = null;
-
-    static final String DATABASE_NAME = "MedicineDataBase";
-    static final int DATABASE_VERSION = 1;
     public static final String MED_TABLE = "medicine";
     public static final String COLUMN_MED_ID = "id";
     public static final String COLUMN_MED_NAME = "name";
     public static final String COLUMN_MED_DESCRIPTION = "description";
     public static final String COLUMN_MED_EXPIREDATE = "expirationDate";
     public static final String COLUMN_MED_SRCIMG = "srcImage";
-
-    public enum MedColumns {
-        TABLE_MEDICINE,
-        MED_ID,
-        MED_NAME,
-        MED_DESC,
-        MED_EXPDATE,
-        MED_SRCIMG;
-
-        @Override
-        public String toString() {
-            switch (this) {
-                case TABLE_MEDICINE:
-                    return "medicine";
-                case MED_ID:
-                    return "id";
-                case MED_NAME:
-                    return "name";
-                case MED_DESC:
-                    return "description";
-                case MED_EXPDATE:
-                    return "expirationDate";
-                case MED_SRCIMG:
-                    return "srcImage";
-
-            }
-            return super.toString();
-        }
-
-    }
-
+    static final String DATABASE_NAME = "MedicineDataBase";
+    static final int DATABASE_VERSION = 1;
     private static final String CREATE_TABLE_MEDS = "CREATE TABLE "
             + MED_TABLE + "(" + COLUMN_MED_ID
             + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -66,6 +32,12 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
             + COLUMN_MED_DESCRIPTION + " TEXT,"
             + COLUMN_MED_EXPIREDATE + " DATE,"
             + COLUMN_MED_SRCIMG + " TEXT);";
+    static DataBaseMedsHandler instance = null;
+    static SQLiteDatabase database = null;
+
+    public DataBaseMedsHandler(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
 
     public static void init(Context context) {
         if (null == instance) {
@@ -88,9 +60,45 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
         instance = null;
     }
 
+    /**
+     * This method is used to set date to Long
+     *
+     * @param date
+     * @return
+     */
 
-    public DataBaseMedsHandler(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    public static Long persistDate(Date date) {
+        //System.out.println("LONG TIME Persisted  " + date.getTime());
+        return date != null ? date.getTime() : null;
+
+    }
+
+    /**
+     * This method is used to set Long to Date
+     *
+     * @param cursor , index
+     * @return
+     */
+    public static Date loadDate(Cursor cursor, int index) {
+        // System.out.println("LONG TIME LOADED  " + new Date(cursor.getLong(index)).getTime());
+        return cursor.isNull(index) ? null : new Date(cursor.getLong(index));
+    }
+
+    public static int deleteAll() {
+        return getDatabase().delete(MED_TABLE, "1", null);
+    }
+
+    public static Cursor getCursor() {
+        // TODO Auto-generated method stub
+        String[] columns = new String[]{
+                COLUMN_MED_ID,
+                COLUMN_MED_NAME,
+                COLUMN_MED_DESCRIPTION,
+                COLUMN_MED_EXPIREDATE,
+                COLUMN_MED_SRCIMG,
+        };
+        return getDatabase().query(MED_TABLE, columns, null, null, null, null,
+                null);
     }
 
     @Override
@@ -106,49 +114,6 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    /**
-     * This method is used to set date to Long
-     *
-     * @param date
-     * @return
-     */
-
-    public static Long persistDate(Date date) {
-        System.out.println("LONG TIME Persisted  " + date.getTime());
-        return date != null ? date.getTime() : null;
-
-    }
-
-    /**
-     * This method is used to set Long to Date
-     *
-     * @param cursor , index
-     * @return
-     */
-    public static Date loadDate(Cursor cursor, int index) {
-        System.out.println("LONG TIME LOADED  " + new Date(cursor.getLong(index)).getTime());
-        return cursor.isNull(index) ? null : new Date(cursor.getLong(index));
-    }
-    /*public Date LongToDate(String longValue) {
-        //  Calendar c = Calendar.getInstance();
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-        df.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        Long time;
-        Date date = null;
-
-        try {
-            time = Long.parseLong(longValue);
-            date  = new Date(TimeUnit.SECONDS.toMillis(time) );
-            //date = new Date(time);
-            System.out.println("Correct date time value: " + df.format(date));
-            System.out.println("LONG TIME  " + time);
-
-        } catch (NumberFormatException format) {
-            format.printStackTrace();
-        }
-        return date;
-    }*/
     /**
      * This method is used to add Med to Meds Table
      *
@@ -193,7 +158,6 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
                 new String[]{String.valueOf(med.getId())});
     }
 
-
     /**
      * Used to delete particular Med entry
      *
@@ -202,7 +166,6 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
     public int deleteEntry(Med med) {
         return deleteEntry(med.getId());
     }
-
 
     /**
      * Used to delete particular Med entry
@@ -214,10 +177,6 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
 
         return getDatabase().delete(MED_TABLE, COLUMN_MED_ID + " = ?",
                 new String[]{String.valueOf(id)});
-    }
-
-    public static int deleteAll() {
-        return getDatabase().delete(MED_TABLE, "1", null);
     }
 
     /**
@@ -276,17 +235,34 @@ public class DataBaseMedsHandler extends SQLiteOpenHelper {
         return medsArrayList;
     }
 
-    public static Cursor getCursor() {
-        // TODO Auto-generated method stub
-        String[] columns = new String[]{
-                COLUMN_MED_ID,
-                COLUMN_MED_NAME,
-                COLUMN_MED_DESCRIPTION,
-                COLUMN_MED_EXPIREDATE,
-                COLUMN_MED_SRCIMG,
-        };
-        return getDatabase().query(MED_TABLE, columns, null, null, null, null,
-                null);
+    public enum MedColumns {
+        TABLE_MEDICINE,
+        MED_ID,
+        MED_NAME,
+        MED_DESC,
+        MED_EXPDATE,
+        MED_SRCIMG;
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case TABLE_MEDICINE:
+                    return "medicine";
+                case MED_ID:
+                    return "id";
+                case MED_NAME:
+                    return "name";
+                case MED_DESC:
+                    return "description";
+                case MED_EXPDATE:
+                    return "expirationDate";
+                case MED_SRCIMG:
+                    return "srcImage";
+
+            }
+            return super.toString();
+        }
+
     }
 
 

@@ -1,7 +1,6 @@
 package com.code.kawakuti.phonepharmacy.utilis;
 
 import android.location.LocationManager;
-import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,7 +18,7 @@ public class PharmacyHelper {
         try {
             return mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
+            // Log.d(TAG, e.getMessage());
         }
         return false;
     }
@@ -28,7 +27,7 @@ public class PharmacyHelper {
         try {
             return mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
+            //Log.d(TAG, e.getMessage());
         }
         return false;
     }

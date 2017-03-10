@@ -1,7 +1,5 @@
 package com.code.kawakuti.phonepharmacy.location;
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +33,6 @@ public class PlacesLocator {
         try {
 
             String json = getJSON(urlString);
-            System.out.println("my Query" + urlString);
             JSONObject object = new JSONObject(json);
             JSONArray array = object.getJSONArray("results");
 
@@ -43,9 +40,10 @@ public class PlacesLocator {
                 try {
                     Place place = Place
                             .jsonToReferencePoint((JSONObject) array.get(i));
-                    Log.v("Places Services ", "" + place);
+                    //Log.v("Places Services ", "" + place);
                     arrayList.add(place);
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -53,8 +51,6 @@ public class PlacesLocator {
             Logger.getLogger(PlacesLocator.class.getName()).log(Level.SEVERE,
                     null, ex);
         }
-        Log.d("ARRAYSIZE", urlString.toString()+"") ;
-        Log.d("ARRAYSIZE", arrayList.size()+"") ;
         return arrayList;
     }
 

@@ -1,21 +1,6 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-    </android.support.design.widget.AppBarLayout>
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -35,10 +20,10 @@
                 android:id="@+id/update_name_med"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:hint="@string/hint_medicine_name"
+                android:layout_alignEnd="@+id/update_pickDate"
                 android:layout_alignParentTop="true"
-                android:layout_alignEnd="@+id/update_pickDate" />
+                android:hint="@string/hint_medicine_name"
+                android:maxLines="1" />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -46,16 +31,16 @@
             android:id="@+id/update_layout_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/update_layout_name"
-            android:layout_alignParentStart="true">
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/update_layout_name">
 
             <EditText
                 android:id="@+id/update_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_description"
                 android:layout_above="@+id/update_pickDate"
-                android:layout_alignEnd="@+id/update_pickDate" />
+                android:layout_alignEnd="@+id/update_pickDate"
+                android:hint="@string/hint_description" />
 
 
         </android.support.design.widget.TextInputLayout>
@@ -64,85 +49,85 @@
 
         <TextView
             android:id="@+id/update_pickDate"
-            android:text="@string/pick_date"
-            android:fontFamily="sans-serif"
-            android:textStyle="bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/update_layout_description"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
-            android:layout_below="@+id/update_layout_description"
-            android:layout_alignParentStart="true" />
+            android:fontFamily="sans-serif"
+            android:text="@string/pick_date"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/update_btn_add_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/select_photo"
-            android:layout_gravity="center_horizontal|bottom"
-            android:textStyle="bold"
-            android:background="@drawable/button_background"
-            android:shadowColor="#7fa07bfc"
-            android:layout_marginTop="4dp"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="8dp"
-            android:shadowDx="4"
-            android:shadowDy="-4"
             android:layout_above="@+id/linearLayout2"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="40dp" />
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="40dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/button_background"
+            android:shadowColor="#7fa07bfc"
+            android:shadowDx="4"
+            android:shadowDy="-4"
+            android:text="@string/select_photo"
+            android:textStyle="bold" />
 
 
         <LinearLayout
+            android:id="@+id/linearLayout2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:id="@+id/linearLayout2">
+            android:layout_gravity="center_horizontal">
 
             <Button
                 android:id="@+id/save_upate"
-                android:fontFamily="sans-serif"
-                android:text="@string/save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginBottom="4dp"
-                android:textStyle="bold"
+                android:layout_marginTop="4dp"
                 android:background="@drawable/button_background"
+                android:fontFamily="sans-serif"
                 android:shadowColor="#7fa07bfc"
                 android:shadowDx="4"
-                android:shadowDy="-4"/>
+                android:shadowDy="-4"
+                android:text="@string/save"
+                android:textStyle="bold" />
             <Button
                 android:id="@+id/cancel_update"
-                android:fontFamily="sans-serif"
-                android:text="@string/cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
-                android:layout_marginBottom="4dp"
-                android:textStyle="bold"
+                android:layout_marginTop="4dp"
                 android:background="@drawable/button_background"
+                android:fontFamily="sans-serif"
                 android:shadowColor="#7fa07bfc"
                 android:shadowDx="4"
-                android:shadowDy="-4"/>
+                android:shadowDy="-4"
+                android:text="@string/cancel"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <DatePicker
             android:id="@+id/update_expiration_date"
             android:layout_width="wrap_content"
             android:layout_height="162dp"
-            android:layout_gravity="center_horizontal"
-            android:fontFamily="sans-serif"
-            android:datePickerMode="spinner"
-            android:calendarViewShown="false"
             android:layout_above="@+id/update_btn_add_photo"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:calendarViewShown="false"
+            android:datePickerMode="spinner"
+            android:fontFamily="sans-serif" />
 
     </RelativeLayout>
 

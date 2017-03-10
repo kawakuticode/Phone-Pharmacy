@@ -8,7 +8,6 @@ import android.media.RingtoneManager;
 
 import com.code.kawakuti.phonepharmacy.alert.AlarmAlertBroadcastReceiver;
 import com.code.kawakuti.phonepharmacy.database.DataBaseAlarmsHandler;
-import com.google.android.gms.drive.DriveFile;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -29,7 +28,10 @@ public class Alarm implements Serializable {
 
 
     private String alarmName = "";
+    private Boolean event = false;
 
+    public Alarm() {
+    }
 
     @Override
     public String toString() {
@@ -41,46 +43,6 @@ public class Alarm implements Serializable {
                 ", vibrate=" + vibrate +
                 ", alarmName='" + alarmName + '\'' +
                 '}';
-    }
-
-    public enum Day {
-        SUNDAY,
-        MONDAY,
-        TUESDAY,
-        WEDNESDAY,
-        THURSDAY,
-        FRIDAY,
-        SATURDAY;
-
-
-        @Override
-        public String toString() {
-            switch (this.ordinal()) {
-                case 0:
-                    return "Sunday";
-                case 1:
-                    return "Monday";
-                case 2:
-                    return "Tuesday";
-                case 3:
-                    return "Wednesday";
-                case 4:
-                    return "Thursday";
-                case 5:
-                    return "Friday";
-                case 6:
-                    return "Saturday";
-            }
-            return super.toString();
-        }
-
-    }
-
-
-
-
-
-    public Alarm() {
     }
 
     /**
@@ -115,6 +77,28 @@ public class Alarm implements Serializable {
     }
 
     /**
+     * @param alarmTime the alarmTime to set
+     */
+    public void setAlarmTime(String alarmTime) {
+
+        String[] timePieces = alarmTime.split(":");
+
+        Calendar newAlarmTime = Calendar.getInstance();
+        newAlarmTime.set(Calendar.HOUR_OF_DAY,
+                Integer.parseInt(timePieces[0]));
+        newAlarmTime.set(Calendar.MINUTE, Integer.parseInt(timePieces[1]));
+        newAlarmTime.set(Calendar.SECOND, 0);
+        setAlarmTime(newAlarmTime);
+    }
+
+    /**
+     * @param alarmTime the alarmTime to set
+     */
+    public void setAlarmTime(Calendar alarmTime) {
+        this.alarmTime = alarmTime;
+    }
+
+    /**
      * @return the alarmTime
      */
     public String getAlarmTimeString() {
@@ -130,28 +114,6 @@ public class Alarm implements Serializable {
         time += String.valueOf(alarmTime.get(Calendar.MINUTE));
 
         return time;
-    }
-
-    /**
-     * @param alarmTime the alarmTime to set
-     */
-    public void setAlarmTime(Calendar alarmTime) {
-        this.alarmTime = alarmTime;
-    }
-
-    /**
-     * @param alarmTime the alarmTime to set
-     */
-    public void setAlarmTime(String alarmTime) {
-
-        String[] timePieces = alarmTime.split(":");
-
-        Calendar newAlarmTime = Calendar.getInstance();
-        newAlarmTime.set(Calendar.HOUR_OF_DAY,
-                Integer.parseInt(timePieces[0]));
-        newAlarmTime.set(Calendar.MINUTE, Integer.parseInt(timePieces[1]));
-        newAlarmTime.set(Calendar.SECOND, 0);
-        setAlarmTime(newAlarmTime);
     }
 
     /**
@@ -198,8 +160,6 @@ public class Alarm implements Serializable {
         this.event = event;
     }
 
-    private Boolean event = false;
-
     /**
      * @return the alarmTonePath
      */
@@ -241,7 +201,6 @@ public class Alarm implements Serializable {
     public void setAlarmName(String alarmName) {
         this.alarmName = alarmName;
     }
-
 
     public int getId() {
         return id;
@@ -323,42 +282,36 @@ public class Alarm implements Serializable {
         return alert;
     }
 
-/*    @Override
-    public int describeContents() {
-        return 0;
-    }
+    public enum Day {
+        SUNDAY,
+        MONDAY,
+        TUESDAY,
+        WEDNESDAY,
+        THURSDAY,
+        FRIDAY,
+        SATURDAY;
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.id);
-        dest.writeValue(this.alarmActive);
-        dest.writeSerializable(this.alarmTime);
-        dest.writeString(this.getRepeatDaysString());
-        dest.writeString(this.alarmTonePath);
-        dest.writeValue(this.vibrate);
-        dest.writeString(this.alarmName);
-    }
-
-    protected Alarm(Parcel in) {
-        this.id = in.readInt();
-        this.alarmActive = (Boolean) in.readValue(Boolean.class.getClassLoader());
-        this.alarmTime = (Calendar) in.readSerializable();
-        this.days = in.readParcelable(Day[].class.getClassLoader());
-        //this.days= in.readString()
-        this.alarmTonePath = in.readString();
-        this.vibrate = (Boolean) in.readValue(Boolean.class.getClassLoader());
-        this.alarmName = in.readString();
-    }
-
-    public static final Parcelable.Creator<Alarm> CREATOR = new Parcelable.Creator<Alarm>() {
-        @Override
-        public Alarm createFromParcel(Parcel source) {
-            return new Alarm(source);
-        }
 
         @Override
-        public Alarm[] newArray(int size) {
-            return new Alarm[size];
+        public String toString() {
+            switch (this.ordinal()) {
+                case 0:
+                    return "Sunday";
+                case 1:
+                    return "Monday";
+                case 2:
+                    return "Tuesday";
+                case 3:
+                    return "Wednesday";
+                case 4:
+                    return "Thursday";
+                case 5:
+                    return "Friday";
+                case 6:
+                    return "Saturday";
+            }
+            return super.toString();
         }
-    };*/
+
+    }
 }

@@ -1,17 +1,10 @@
 package com.code.kawakuti.phonepharmacy.preferences;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Environment;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.os.Process;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +22,7 @@ public class AlarmPreferenceListAdapter extends BaseAdapter implements Serializa
 
     private Context context;
     private Alarm alarm;
-    private List<AlarmPreference> preferences = new ArrayList<AlarmPreference>();
+    private List<AlarmPreference> preferences = new ArrayList<>();
     private String[] repeatDays = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 
@@ -41,7 +34,8 @@ public class AlarmPreferenceListAdapter extends BaseAdapter implements Serializa
 
         this.context = context;
 
-        Log.d("AlarmPreferenceList", "Loading Ringtones...");
+
+        // Log.d("AlarmPreferenceList", "Loading Ringtones...");
 
         RingtoneManager ringtoneMgr = new RingtoneManager(context);
 
@@ -60,7 +54,7 @@ public class AlarmPreferenceListAdapter extends BaseAdapter implements Serializa
                 alarmTonePaths[alarmsCursor.getPosition() + 1] = ringtoneMgr.getRingtoneUri(alarmsCursor.getPosition()).toString();
             } while (alarmsCursor.moveToNext());
         }
-        Log.d("AlarmPreferenceL", "Finished Loading " + alarmTones.length + " Ringtones.");
+        //  Log.d("AlarmPreferenceL", "Finished Loading " + alarmTones.length + " Ringtones.");
         alarmsCursor.close();
         setMyAlarm(alarm);
     }
@@ -153,7 +147,7 @@ public class AlarmPreferenceListAdapter extends BaseAdapter implements Serializa
         Uri alarmToneUri = Uri.parse(alarm.getAlarmTonePath());
         Ringtone alarmTone = RingtoneManager.getRingtone(getContext(), alarmToneUri);
 
-        if (alarmTone instanceof Ringtone && !alarm.getAlarmTonePath().equalsIgnoreCase("")) {
+        if (alarmTone != null && !alarm.getAlarmTonePath().equalsIgnoreCase("")) {
             preferences.add(new AlarmPreference(AlarmPreference.Key.ALARM_TONE, "Ringtone", alarmTone.getTitle(getContext()), alarmTones, alarm.getAlarmTonePath(), AlarmPreference.Type.LIST));
         } else {
             preferences.add(new AlarmPreference(AlarmPreference.Key.ALARM_TONE, "Ringtone", getAlarmTones()[0], alarmTones, null, AlarmPreference.Type.LIST));

@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -25,9 +24,9 @@ import com.code.kawakuti.phonepharmacy.models.Alarm;
 
 public class AlarmAlertActivity extends Activity implements OnClickListener {
 
+    Button stopAlarm;
     private Alarm alarm;
     private MediaPlayer mediaPlayer;
-    Button stopAlarm;
     private Vibrator vibrator;
     private boolean alarmActive;
     private TextView textMedicine;
@@ -62,8 +61,8 @@ public class AlarmAlertActivity extends Activity implements OnClickListener {
             public void onCallStateChanged(int state, String incomingNumber) {
                 switch (state) {
                     case TelephonyManager.CALL_STATE_RINGING:
-                        Log.d(getClass().getSimpleName(), "Incoming call: "
-                                + incomingNumber);
+                        //  Log.d(getClass().getSimpleName(), "Incoming call: "
+                        //        + incomingNumber);
                         try {
                             mediaPlayer.pause();
                         } catch (IllegalStateException e) {
@@ -71,7 +70,7 @@ public class AlarmAlertActivity extends Activity implements OnClickListener {
                         }
                         break;
                     case TelephonyManager.CALL_STATE_IDLE:
-                        Log.d(getClass().getSimpleName(), "Call State Idle");
+                        //   Log.d(getClass().getSimpleName(), "Call State Idle");
                         try {
                             mediaPlayer.start();
                         } catch (IllegalStateException e) {

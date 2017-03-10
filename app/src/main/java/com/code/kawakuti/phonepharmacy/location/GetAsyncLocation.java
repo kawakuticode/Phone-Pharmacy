@@ -21,10 +21,9 @@ public class GetAsyncLocation extends AsyncTask<MyLocationTrack, Void, Location>
     private ProgressDialog dialog;
 
 
-    public GetAsyncLocation(MyLocationTrack loc, Location location, Context context, String typeOfPlace) {
-
-        this.result_location = location;
+    public GetAsyncLocation(MyLocationTrack loc, Context context, String typeOfPlace) {
         this.myLocationTrack = loc;
+        this.result_location = myLocationTrack.startRetrievingLocation();
         this.mContext = context;
         this.type_of_place = typeOfPlace;
 
@@ -34,10 +33,9 @@ public class GetAsyncLocation extends AsyncTask<MyLocationTrack, Void, Location>
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        result_location = myLocationTrack.startRetrievingLocation();
         dialog = new ProgressDialog(mContext);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setMessage("wait while find..."+type_of_place);
+        dialog.setMessage("searching..." + type_of_place);
         dialog.setCancelable(false);
         dialog.show();
 
@@ -61,14 +59,12 @@ public class GetAsyncLocation extends AsyncTask<MyLocationTrack, Void, Location>
             Intent findplaces = new Intent(mContext, ShowPlacesOnMap.class);
             findplaces.putExtra("TYPE_OF_PLACE", type_of_place);
             findplaces.putExtra("location", location);
+            myLocationTrack.stopRetrievingLocation();
             mContext.startActivity(findplaces);
-
         } else  {
             dialog.dismiss();
             Toast.makeText(mContext ," Unable to get Your Location Try Again / check you have data conectivity ", Toast.LENGTH_LONG ).show();
         }
-
     }
-
 }
 

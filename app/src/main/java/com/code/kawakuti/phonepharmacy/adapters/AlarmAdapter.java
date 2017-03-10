@@ -29,10 +29,10 @@ import java.util.List;
 
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmHolder> {
 
-    private AlarmActivity alarmActivity;
-    private List<Alarm> alarms;
     public static final String ALARM_FIELDS[] = {DataBaseAlarmsHandler.COLUMN_ALARM_ACTIVE,
             DataBaseAlarmsHandler.COLUMN_ALARM_TIME, DataBaseAlarmsHandler.COLUMN_ALARM_DAYS};
+    private AlarmActivity alarmActivity;
+    private List<Alarm> alarms;
     private Context mContext;
 
     public AlarmAdapter(AlarmActivity alarmActivity, List<Alarm> database_alarm, Context context) {
@@ -85,10 +85,36 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmHolder>
 
 
     public class AlarmHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener, View.OnClickListener {
+        private final MenuItem.OnMenuItemClickListener onChosenMenu = new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Alarm alarm_to = alarms.get(getAdapterPosition());
+                switch (item.getItemId()) {
+
+                    case 1:
+                        Intent intent = new Intent(getmContext(), AlarmPreferencesAlarmActivity.class);
+                        intent.putExtra("alarm", alarm_to);
+                        getmContext().startActivity(intent);
+                        break;
+
+                    case 2:
+                        DataBaseAlarmsHandler.init(getmContext());
+                        DataBaseAlarmsHandler.deleteEntry(alarm_to);
+                        callAlarmScheduleService(alarm_to);
+                        setAlarms(DataBaseAlarmsHandler.getAllAlarms());
+                        getAlarmAdapter().notifyDataSetChanged();
+                        DataBaseAlarmsHandler.deactivate();
+                        break;
+                    case 3:
+                        break;
+                }
+                return true;
+
+            }
+        };
         private CheckBox checkBox;
         private ImageView alarm_icon;
         private TextView medicineTake, alarmeTimeView, alarmDaysView;
-
 
         public AlarmHolder(View itemView) {
             super(itemView);
@@ -118,9 +144,14 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmHolder>
                     DataBaseAlarmsHandler.init(getmContext());
                     DataBaseAlarmsHandler.update(alarm);
                     DataBaseAlarmsHandler.deactivate();
+
                     if (checkBox.isChecked()) {
+                        alarm.setAlarmActive(checkBox.isChecked());
                         callAlarmScheduleService(alarm);
                         alarm_icon.setImageResource(getResId(alarm.getAlarmActive()));
+                        DataBaseAlarmsHandler.init(getmContext());
+                        DataBaseAlarmsHandler.update(alarm);
+                        DataBaseAlarmsHandler.deactivate();
                         Toast.makeText(getmContext(), alarm.getTimeUntilNextAlarmMessage(), Toast.LENGTH_LONG).show();
                     }
                 }
@@ -138,35 +169,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmHolder>
 
 
         }
-
-        private final MenuItem.OnMenuItemClickListener onChosenMenu = new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Alarm alarm_to = alarms.get(getAdapterPosition());
-                switch (item.getItemId()) {
-
-                    case 1:
-                        Intent intent = new Intent(getmContext(), AlarmPreferencesAlarmActivity.class);
-                        intent.putExtra("alarm", alarm_to);
-                        getmContext().startActivity(intent);
-                        break;
-
-                    case 2:
-                        DataBaseAlarmsHandler.init(getmContext());
-                        DataBaseAlarmsHandler.deleteEntry(alarm_to);
-                        callAlarmScheduleService(alarm_to);
-                        setAlarms(DataBaseAlarmsHandler.getAllAlarms());
-                        getAlarmAdapter().notifyDataSetChanged();
-                        DataBaseAlarmsHandler.deactivate();
-                        break;
-                    case 3:
-                        break;
-                }
-                return true;
-
-            }
-        };
-
 
         protected void callAlarmScheduleService(Alarm alarm) {
             mContext.sendBroadcast(new Intent(mContext, AlarmServiceBroadcastReceiver.class), null);

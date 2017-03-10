@@ -7,10 +7,10 @@
 
 
     <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|center"
-        android:id="@+id/relativeLayout">
+        android:layout_gravity="center_horizontal|center">
 
     </RelativeLayout>
 
@@ -18,17 +18,17 @@
         android:id="@+id/button_stop_alarm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal|bottom"
-        android:text="@string/stop_alarm"
-        android:textStyle="bold"
-        android:background="@drawable/rounded_button"
+        android:layout_marginBottom="47dp"
+        android:background="@drawable/button_background"
+        android:padding="15dp"
         android:shadowColor="#7fa07bfc"
         android:shadowDx="4"
         android:shadowDy="-4"
-        android:padding="15dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="47dp" />
+        android:text="@string/stop_alarm"
+        android:textStyle="bold" />
 
     <TextClock
         android:id="@+id/time_content"
@@ -38,43 +38,43 @@
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:keepScreenOn="true"
-        android:text="@string/dummy_content"
-        android:textSize="50sp"
-        android:textStyle="bold"
-        android:textColor="#33b5e5"
         android:shadowColor="#7fa07bfc"
         android:shadowDx="4"
         android:shadowDy="-4"
-        android:shadowRadius="1"/>
+        android:shadowRadius="1"
+        android:text="@string/dummy_content"
+        android:textColor="#33b5e5"
+        android:textSize="50sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/medicine_take"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
         android:layout_above="@+id/button_stop_alarm"
         android:layout_alignEnd="@+id/time_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="137dp"
         android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#33b5e5"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/scheduleTime"
-        android:paddingBottom="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/schedule_med"
-        android:textColor="#33b5e5"
-        android:shadowColor="#7fa07bfc"
-        android:textSize="25sp"
-        android:textStyle="bold"
+        android:layout_above="@+id/time_content"
+        android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal|center"
+        android:paddingBottom="20dp"
+        android:shadowColor="#7fa07bfc"
         android:shadowDx="4"
         android:shadowDy="-4"
         android:shadowRadius="1"
-        android:layout_above="@+id/time_content"
-        android:layout_centerHorizontal="true" />
+        android:text="@string/schedule_med"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#33b5e5"
+        android:textSize="25sp"
+        android:textStyle="bold" />
 </RelativeLayout>

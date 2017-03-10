@@ -19,12 +19,21 @@ import com.code.kawakuti.phonepharmacy.service.BroadCastAlarm;
  */
 public class TakeMedicineAlarm extends AppCompatActivity {
 
-    AlarmManager alarmManager;
-    PendingIntent pendingIntent;
     static TextView medicine;
     static TextView time;
+    AlarmManager alarmManager;
+    PendingIntent pendingIntent;
     int timeHour, timeMinute;
 
+    public static TextView getTextTimeView() {
+        return time;
+
+    }
+
+    public static TextView getTextMedicine() {
+        return medicine;
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +41,6 @@ public class TakeMedicineAlarm extends AppCompatActivity {
         setContentView(R.layout.takemedicealarm);
         time = (TextClock) findViewById(R.id.time_content);
         medicine = (TextView) findViewById(R.id.medicine_take);
-
-        /*Intent tmp = getIntent();
-
-        SimpleDateFormat mSDF = new SimpleDateFormat("hh:mm aa");
-        time.setText(mSDF.format(tmp.getStringExtra("time_intent")));*/
-
         findViewById(R.id.button_stop_alarm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,17 +57,6 @@ public class TakeMedicineAlarm extends AppCompatActivity {
         alarmManager.cancel(sender);
         // Tell the user about what we did.
         Toast.makeText(this, "repeating_unscheduled", Toast.LENGTH_LONG).show();
-    }
-
-
-    public static TextView getTextTimeView() {
-        return time;
-
-    }
-
-    public static TextView getTextMedicine() {
-        return medicine;
-
     }
 
 

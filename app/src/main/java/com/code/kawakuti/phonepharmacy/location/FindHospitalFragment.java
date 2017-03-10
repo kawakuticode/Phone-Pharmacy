@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -24,11 +23,10 @@ import com.code.kawakuti.phonepharmacy.utilis.PharmacyHelper;
  */
 public class FindHospitalFragment extends Fragment {
 
+    private static String TYPE_OF_PLACE = "hospital";
     private ImageLoader l;
     private LocationManager lmanager;
     private MyLocationTrack mylocation;
-    private Location result_location = null;
-    private static String TYPE_OF_PLACE = "hospital";
     private LocationUtilities l_utilities;
 
 
@@ -44,17 +42,18 @@ public class FindHospitalFragment extends Fragment {
 
         lmanager = (LocationManager) this.getContext().getSystemService(Context.LOCATION_SERVICE);
         mylocation = new MyLocationTrack(getContext(), lmanager);
+
         l_utilities = new LocationUtilities(getContext(), getActivity());
 
         circularImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(getContext(), "Searching for Hospitals", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "finding your location ...", Toast.LENGTH_SHORT).show();
                 if (!PharmacyHelper.isGpsLocationProviderEnabled(lmanager)) {
                     l_utilities.showGpsSettingsAlert();
                 } else {
-                    new GetAsyncLocation(mylocation, result_location, getContext(), TYPE_OF_PLACE).execute();
+                    new GetAsyncLocation(mylocation, getContext(), TYPE_OF_PLACE).execute();
 
                 }
 

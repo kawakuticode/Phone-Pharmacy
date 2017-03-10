@@ -9,7 +9,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +26,6 @@ import com.code.kawakuti.phonepharmacy.models.Alarm;
 import com.code.kawakuti.phonepharmacy.models.Alarm.Day;
 import com.code.kawakuti.phonepharmacy.preferences.AlarmPreferencesAlarmActivity;
 
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -40,11 +38,12 @@ import au.com.bytecode.opencsv.CSVReader;
 public class AlarmActivity extends Fragment {
     ListView alarmListView;
     View rootView;
+    AlarmAdapter alarmAdapter;
     private DataBaseAlarmsHandler db_alarms;
     private String file_name = "alarm_data_base_back_up.csv";
     private String import_file_path = "/PhoneParmacy/alarm_data_base_back_up.csv";
     private List<Alarm> alarmList = new ArrayList<>();
-    AlarmAdapter alarmAdapter;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -60,7 +59,7 @@ public class AlarmActivity extends Fragment {
 
         db_alarms = new DataBaseAlarmsHandler(this.getContext());
 
-        alarmList = db_alarms.getAllAlarms();
+        alarmList = DataBaseAlarmsHandler.getAllAlarms();
 
 
         alarmAdapter = new AlarmAdapter(this, alarmList, this.getContext());
@@ -110,7 +109,7 @@ public class AlarmActivity extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_export:
-                Log.d("DaTABASE TABLE ", DataBaseAlarmsHandler.ALARM_TABLE);
+                //    Log.d("DaTABASE TABLE ", DataBaseAlarmsHandler.ALARM_TABLE);
         db_alarms=new DataBaseAlarmsHandler(getContext());
         new ExportDataBaseToFile(getContext(),db_alarms,file_name,DataBaseAlarmsHandler.ALARM_TABLE).execute();
                 break;
@@ -125,72 +124,6 @@ public class AlarmActivity extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private class ImportCSVAlarmsFileToDataBaseTask extends AsyncTask<String, Void, Long> {
-        private final ProgressDialog dialog = new ProgressDialog(getContext());
-        private String file_path;
-        Long insertions = Long.valueOf(0);
-        public ImportCSVAlarmsFileToDataBaseTask(String path) {
-            this.file_path = path;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            this.dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            this.dialog.setMessage("Please wait while importing database...");
-            this.dialog.setCancelable(false);
-            this.dialog.show();
-        }
-        @Override
-        protected Long doInBackground(String... params) {
-            DataBaseAlarmsHandler.init(getContext());
-            try {
-                CSVReader reader = new CSVReader(new FileReader(file_path));
-                String[] nextLine;
-                boolean first_line = true;
-                while ((nextLine = reader.readNext()) != null) {
-                 if (nextLine.length != 7) {
-                        Log.d("CSVParser ---> ", "Bad Csv File");
-                        continue;
-                    }
-                    if (first_line) {
-                        first_line = false;
-                        continue;
-                    } else {
-                        Alarm tmp = new Alarm();
-                        tmp.setAlarmActive(integerToBoolean(ParserStringToInt(nextLine[1].trim())));
-                        tmp.setAlarmTime(nextLine[2].trim());
-                        tmp.setDays(arrayToDay(nextLine[3].trim()));
-                        tmp.setAlarmTonePath(nextLine[4].trim());
-                        tmp.setVibrate(integerToBoolean(ParserStringToInt(nextLine[5].trim())));
-                        tmp.setAlarmName(nextLine[6].trim());
-                        insertions += DataBaseAlarmsHandler.create(tmp);
-                    }
-                }
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            DataBaseAlarmsHandler.deactivate();
-            return insertions;
-        }
-
-
-        @Override
-        protected void onPostExecute(Long check) {
-            super.onPostExecute(check);
-            if (dialog.isShowing()) {
-                dialog.dismiss();
-            }
-            if (check > 0) {
-                updateAlarmList();
-                Toast.makeText(getContext(), "DataBase imported Successfully!" + "\n", Toast.LENGTH_LONG).show();
-            } else {
-                updateAlarmList();
-                Toast.makeText(getContext(), "Fail to import dataBase", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-
     public Integer ParserStringToInt(String i) {
         int x = 0;
         try {
@@ -202,9 +135,8 @@ public class AlarmActivity extends Fragment {
     }
 
     public boolean integerToBoolean(int i) {
-        return i == 1 ? true : false;
+        return i == 1;
     }
-
 
     public String getImport_file_path(String file_path) {
         String state = Environment.getExternalStorageState();
@@ -258,6 +190,73 @@ public class AlarmActivity extends Fragment {
                 break;
         }
         return tmp;
+    }
+
+    private class ImportCSVAlarmsFileToDataBaseTask extends AsyncTask<String, Void, Long> {
+        private final ProgressDialog dialog = new ProgressDialog(getContext());
+        Long insertions = Long.valueOf(0);
+        private String file_path;
+
+        public ImportCSVAlarmsFileToDataBaseTask(String path) {
+            this.file_path = path;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            this.dialog.setMessage("Please wait while importing database...");
+            this.dialog.setCancelable(false);
+            this.dialog.show();
+        }
+
+        @Override
+        protected Long doInBackground(String... params) {
+            DataBaseAlarmsHandler.init(getContext());
+            try {
+                CSVReader reader = new CSVReader(new FileReader(file_path));
+                String[] nextLine;
+                boolean first_line = true;
+                while ((nextLine = reader.readNext()) != null) {
+                    if (nextLine.length != 7) {
+                        //  Log.d("CSVParser ---> ", "Bad Csv File");
+                        continue;
+                    }
+                    if (first_line) {
+                        first_line = false;
+                        continue;
+                    } else {
+                        Alarm tmp = new Alarm();
+                        tmp.setAlarmActive(integerToBoolean(ParserStringToInt(nextLine[1].trim())));
+                        tmp.setAlarmTime(nextLine[2].trim());
+                        tmp.setDays(arrayToDay(nextLine[3].trim()));
+                        tmp.setAlarmTonePath(nextLine[4].trim());
+                        tmp.setVibrate(integerToBoolean(ParserStringToInt(nextLine[5].trim())));
+                        tmp.setAlarmName(nextLine[6].trim());
+                        insertions += DataBaseAlarmsHandler.create(tmp);
+                    }
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            DataBaseAlarmsHandler.deactivate();
+            return insertions;
+        }
+
+
+        @Override
+        protected void onPostExecute(Long check) {
+            super.onPostExecute(check);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+            if (check > 0) {
+                updateAlarmList();
+                Toast.makeText(getContext(), "DataBase imported Successfully!" + "\n", Toast.LENGTH_LONG).show();
+            } else {
+                updateAlarmList();
+                Toast.makeText(getContext(), "Fail to import dataBase", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
 

@@ -10,7 +10,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,13 +44,10 @@ public class MedicinesFragment extends Fragment {
     private static final String TAG = "PHARMACY";
     private static final int SELECT_FILE = 1;
     private static String IMPORT_FILE_PATH = "/PhoneParmacy/medicine_data_base_back_up.csv";
-
+    View rootView;
     private MedicinesAdapter medicineAdapter;
     private List<Med> listMeds = new ArrayList<Med>();
     private DataBaseMedsHandler db;
-    View rootView;
-
-
     private String file_name = "medicine_data_base_back_up.csv";
 
     @Override
@@ -140,7 +136,7 @@ public class MedicinesFragment extends Fragment {
                 break;
             case R.id.menu_item_import:
                 String path = getImport_file_path(IMPORT_FILE_PATH);
-                if (!path.toString().isEmpty()) {
+                if (!path.isEmpty()) {
                     new ImportCSVMedicineFileToDataBaseTask(path).execute();
                 } else
                     Toast.makeText(getActivity(), "No preview DataBase to import", Toast.LENGTH_LONG).show();
@@ -167,10 +163,41 @@ public class MedicinesFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    public String getImport_file_path(String file_path) {
+        String state = Environment.getExternalStorageState();
+        String path;
+
+        if (!Environment.MEDIA_MOUNTED.equals(state)) {
+            path = "";
+        } else {
+            File import_file = new File(Environment.getExternalStorageDirectory(), file_path);
+            if (!import_file.exists()) {
+                path = "";
+            } else {
+                path = import_file.getAbsolutePath();
+            }
+        }
+        return path;
+    }
+
+    public Date LongToDate(String longValue) {
+        //  Calendar c = Calendar.getInstance();
+        // DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        //df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date date = null;
+        try {
+            date = new Date(Long.parseLong(longValue));
+            //date = new Date(TimeUnit.SECONDS.toMillis(time));
+        } catch (NumberFormatException format) {
+            format.printStackTrace();
+        }
+        return date;
+    }
+
     private class ImportCSVMedicineFileToDataBaseTask extends AsyncTask<String, Void, Long> {
         private final ProgressDialog dialog = new ProgressDialog(getContext());
-        private String file_path;
         Long result;
+        private String file_path;
 
         public ImportCSVMedicineFileToDataBaseTask(String path) {
             this.file_path = path;
@@ -192,7 +219,7 @@ public class MedicinesFragment extends Fragment {
                 boolean first_line = true;
                 while ((nextLine = reader.readNext()) != null) {
                     if (nextLine.length != 5) {
-                        Log.d("CSVParser", "Skipping Bad CSV Row");
+                        //Log.d("CSVParser", "Skipping Bad CSV Row");
                         continue;
                     }
                     if (first_line) {
@@ -242,38 +269,6 @@ public class MedicinesFragment extends Fragment {
                 Toast.makeText(getContext(), "File fail to build", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    public String getImport_file_path(String file_path) {
-        String state = Environment.getExternalStorageState();
-        String path;
-
-        if (!Environment.MEDIA_MOUNTED.equals(state)) {
-            path = "";
-        } else {
-            File import_file = new File(Environment.getExternalStorageDirectory(), file_path);
-            if (!import_file.exists()) {
-                path = "";
-            } else {
-                path = import_file.getAbsolutePath();
-            }
-        }
-        return path;
-    }
-
-
-    public Date LongToDate(String longValue) {
-        //  Calendar c = Calendar.getInstance();
-        // DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-        //df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date date = null;
-        try {
-            date = new Date(Long.parseLong(longValue));
-            //date = new Date(TimeUnit.SECONDS.toMillis(time));
-        } catch (NumberFormatException format) {
-            format.printStackTrace();
-        }
-        return date;
     }
 
 }

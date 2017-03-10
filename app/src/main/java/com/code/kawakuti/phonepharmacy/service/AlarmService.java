@@ -6,7 +6,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.code.kawakuti.phonepharmacy.alert.AlarmAlertBroadcastReceiver;
 import com.code.kawakuti.phonepharmacy.database.DataBaseAlarmsHandler;
@@ -32,7 +31,7 @@ public class AlarmService extends Service {
 	 */
 	@Override
 	public void onCreate() {
-		Log.d(this.getClass().getSimpleName(), "onCreate()");
+		//	Log.d(this.getClass().getSimpleName(), "onCreate()");
 		super.onCreate();
 	}
 
@@ -88,7 +87,7 @@ public class AlarmService extends Service {
 		if (alarm != null) {
 
 			alarm.schedule(getApplicationContext());
-			Log.d("next alarm  --> " , alarm.getTimeUntilNextAlarmMessage().toString());
+			//Log.d("next alarm  --> " , alarm.getTimeUntilNextAlarmMessage().toString());
 
 
 		} else {

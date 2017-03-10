@@ -15,7 +15,6 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -36,13 +35,13 @@ import java.util.Locale;
 
 public class AddMedicineActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static final int MEDIA_TYPE_IMAGE = 1;
     private static final String LOG_TAG = "ADD MEDICINE ACTIVITY";
     private static final String FILENAME = "IMG_";
     private static final String FILETYPE = ".JPG";
     private static final int SELECT_FILE = 1;
     // Activity request codes
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
-    public static final int MEDIA_TYPE_IMAGE = 1;
     // directory name to store captured images and videos
     private static final String IMAGE_DIRECTORY_NAME = "Phone Pharmacy";
 
@@ -60,6 +59,35 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
     private DataBaseMedsHandler db;
     private String img_source;
 
+    private static File getOutputMediaFile(int type) {
+
+        // External sdcard location
+        File mediaStorageDir = new File(
+                Environment
+                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                IMAGE_DIRECTORY_NAME);
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                // Log.d(IMAGE_DIRECTORY_NAME, "Oops! Failed create "
+                //         + IMAGE_DIRECTORY_NAME + " directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
+                Locale.getDefault()).format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator
+                    + FILENAME + timeStamp + FILETYPE);
+        } else {
+            return null;
+        }
+        return mediaFile;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,7 +210,6 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
         startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
     }
 
-
     private void previewCapturedImage() {
         try {
             img_source = fileUri.getPath();
@@ -203,13 +230,18 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
         String selectedImagePath = cursor.getString(column_index);
         img_source = selectedImagePath;
         btn_selectPhoto.setText(changeButtonTextToPath(img_source));
+        cursor.close();
 
     }
 
-
-
     public String changeButtonTextToPath(String path) {
-        return !path.isEmpty() ? splitedPath(path)[splitedPath(path).length - 1] : "select photo";
+        String result = "";
+        if (path != null) {
+            result = !path.isEmpty() ? splitedPath(path)[splitedPath(path).length - 1] : " photo ";
+        } else {
+            result = " photo ";
+        }
+        return result;
     }
 
     public String[] splitedPath(String input) {
@@ -238,13 +270,11 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
         mCalendar = (Calendar) savedInstanceState.getSerializable("calendar_state");
     }
 
-
     @Override
     protected void onResume() {
         // TODO Auto-generated method stub
         super.onResume();
     }
-
 
     @Override
     protected void onPause() {
@@ -273,41 +303,9 @@ public class AddMedicineActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-
     public Uri getOutputMediaFileUri(int type) {
         return Uri.fromFile(getOutputMediaFile(type));
     }
-
-    private static File getOutputMediaFile(int type) {
-
-        // External sdcard location
-        File mediaStorageDir = new File(
-                Environment
-                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                IMAGE_DIRECTORY_NAME);
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d(IMAGE_DIRECTORY_NAME, "Oops! Failed create "
-                        + IMAGE_DIRECTORY_NAME + " directory");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
-                Locale.getDefault()).format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                    + FILENAME + timeStamp + FILETYPE);
-        } else {
-            return null;
-        }
-        return mediaFile;
-    }
-
 
     private class MyTextWatcher implements TextWatcher {
 

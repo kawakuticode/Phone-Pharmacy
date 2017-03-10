@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,18 +21,19 @@ import com.code.kawakuti.phonepharmacy.utilis.PharmacyHelper;
 
 public class FindPharmacyFragment extends Fragment {
 
+    private static String TYPE_OF_PLACE = "pharmacy";
     private ImageLoader l;
     private LocationManager lmanager;
     private MyLocationTrack mylocation;
-    private Location result_location;
-    private static String TYPE_OF_PLACE = "pharmacy";
+    private LocationUtilities l_utilities;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout resource that'll be returned
         View rootView = inflater.inflate(R.layout.findpharmacy, container, false);
 
-        // l = new ImageLoader(this.getContext());
         lmanager = (LocationManager) this.getContext().getSystemService(Context.LOCATION_SERVICE);
+        l_utilities = new LocationUtilities(getContext(), getActivity());
 
         Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.farmacy);
         Bitmap circularBitmap = ImageLoader.getRoundedCornerBitmap(bitmap, 100);
@@ -49,11 +49,11 @@ public class FindPharmacyFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(getContext(), "retrivieng your location ...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "finding your location ...", Toast.LENGTH_SHORT).show();
                 if (!PharmacyHelper.isGpsLocationProviderEnabled(lmanager)) {
-
+                    l_utilities.showGpsSettingsAlert();
                 } else if (PharmacyHelper.isGpsLocationProviderEnabled(lmanager)) {
-                    new GetAsyncLocation(mylocation, result_location, getContext(), TYPE_OF_PLACE).execute();
+                    new GetAsyncLocation(mylocation, getContext(), TYPE_OF_PLACE).execute();
 
                 }
             }
@@ -65,8 +65,6 @@ public class FindPharmacyFragment extends Fragment {
 
     @Override
     public void onPause() {
-        // setListAdapter(null);
-        mylocation.stopRetrievingLocation();
         super.onPause();
     }
 

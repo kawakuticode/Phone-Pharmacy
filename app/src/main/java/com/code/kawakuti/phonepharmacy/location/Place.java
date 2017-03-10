@@ -4,8 +4,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by Russelius on 09/01/16.
@@ -21,6 +19,25 @@ public class Place implements Serializable {
 
     public Place() {
         super();
+    }
+
+    static Place jsonToReferencePoint(JSONObject referencePoint) {
+        try {
+            Place result = new Place();
+            JSONObject geometry = (JSONObject) referencePoint.get("geometry");
+            JSONObject location = (JSONObject) geometry.get("location");
+            result.setLatitude((Double) location.get("lat"));
+            result.setLongitude((Double) location.get("lng"));
+            result.setIcon(referencePoint.getString("icon"));
+            result.setName(referencePoint.getString("name"));
+            result.setVicinity(referencePoint.getString("vicinity"));
+            result.setId(referencePoint.getString("id"));
+            return result;
+        } catch (JSONException ex) {
+            // Logger.getLogger(Place.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     public String getId() {
@@ -69,24 +86,6 @@ public class Place implements Serializable {
 
     public void setVicinity(String vicinity) {
         this.vicinity = vicinity;
-    }
-
-    static Place jsonToReferencePoint(JSONObject referencePoint) {
-        try {
-            Place result = new Place();
-            JSONObject geometry = (JSONObject) referencePoint.get("geometry");
-            JSONObject location = (JSONObject) geometry.get("location");
-            result.setLatitude((Double) location.get("lat"));
-            result.setLongitude((Double) location.get("lng"));
-            result.setIcon(referencePoint.getString("icon"));
-            result.setName(referencePoint.getString("name"));
-            result.setVicinity(referencePoint.getString("vicinity"));
-            result.setId(referencePoint.getString("id"));
-            return result;
-        } catch (JSONException ex) {
-            Logger.getLogger(Place.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
     }
 
     @Override

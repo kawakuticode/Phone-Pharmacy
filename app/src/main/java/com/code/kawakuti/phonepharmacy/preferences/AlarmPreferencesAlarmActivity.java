@@ -1,6 +1,5 @@
 package com.code.kawakuti.phonepharmacy.preferences;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
@@ -16,6 +15,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +36,7 @@ import com.code.kawakuti.phonepharmacy.service.AlarmServiceBroadcastReceiver;
 import java.util.Calendar;
 
 
-public class AlarmPreferencesAlarmActivity extends Activity implements View.OnClickListener {
+public class AlarmPreferencesAlarmActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Alarm alarm;
     private MediaPlayer mediaPlayer;
@@ -45,6 +45,7 @@ public class AlarmPreferencesAlarmActivity extends Activity implements View.OnCl
     private Button add_alarm, cancel_alarm;
     private EditText input;
     private AlertDialog.Builder alert;
+    private CountDownTimer alarmToneTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,7 @@ public class AlarmPreferencesAlarmActivity extends Activity implements View.OnCl
         if (bundle != null && bundle.containsKey("alarm")) {
             //setMyAlarm((Alarm) bundle.getSerializable("alarm"));
             setMyAlarm((Alarm) bundle.getSerializable("alarm"));
-            input.setText(getMyAlarm().getAlarmName().toString());
+            input.setText(getMyAlarm().getAlarmName());
 
         } else {
             setMyAlarm(new Alarm());
@@ -105,7 +106,6 @@ public class AlarmPreferencesAlarmActivity extends Activity implements View.OnCl
                     case STRING:
 
                         AlertDialog alertDialog = new AlertDialog.Builder(AlarmPreferencesAlarmActivity.this).create();
-
                         // Inflate and set the layout for the dialog
                         // Pass null as the parent view because its going in the dialog layout
                         LayoutInflater inflater = AlarmPreferencesAlarmActivity.this.getLayoutInflater();
@@ -187,7 +187,7 @@ public class AlarmPreferencesAlarmActivity extends Activity implements View.OnCl
                                                     if (mediaPlayer.isPlaying())
                                                         mediaPlayer.stop();
                                                 } catch (Exception e2) {
-
+                                                    e2.printStackTrace();
                                                 }
                                             }
                                         }
@@ -270,13 +270,9 @@ public class AlarmPreferencesAlarmActivity extends Activity implements View.OnCl
         });
     }
 
-
     private boolean validateAlarmName(EditText txt) {
-        return txt.getText().toString().trim().isEmpty() ? false : true;
+        return !txt.getText().toString().trim().isEmpty();
     }
-
-
-    private CountDownTimer alarmToneTimer;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -347,7 +343,7 @@ public class AlarmPreferencesAlarmActivity extends Activity implements View.OnCl
         } else {
             if (DataBaseAlarmsHandler.update(alarm) != 0) {
                 callAlarmScheduleService();
-                finishAfterTransition();
+                finish();
             }
         }
     }
