@@ -1,2 +1,15 @@
 #Phone-Pharmacy
-![preview](https://github.com/kawakuticode/Phone-Pharmacy/blob/master/9.png)
+#Phone-Pharmacy
+![preview](https://github.com/kawakuticode/Phone-Pharmacy/blob/master/previews/4.png)
+![preview](https://github.com/kawakuticode/Phone-Pharmacy/blob/master/previews/0.png)
+#Phone-Pharmacy
+![preview](https://github.com/kawakuticode/Phone-Pharmacy/blob/master/previews/3.png)
+![preview](https://github.com/kawakuticode/Phone-Pharmacy/blob/master/previews/1.png)
+#Phone-Pharmacy
+![preview](https://github.com/kawakuticode/Phone-Pharmacy/blob/master/previews/7.png)
+#Phone-Pharmacy
+![preview](https://github.com/kawakuticode/Phone-Pharmacy/blob/master/previews/8.png)
+![preview](https://github.com/kawakuticode/Phone-Pharmacy/blob/master/previews/9.png)
+#Phone-Pharmacy
+![preview](https://github.com/kawakuticode/Phone-Pharmacy/blob/master/previews/12.png)
+![preview](https://github.com/kawakuticode/Phone-Pharmacy/blob/master/previews/11.png)
